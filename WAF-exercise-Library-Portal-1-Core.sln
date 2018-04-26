@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WAF-exercise-Library-Portal-1-Core-WA", "WAF-exercise-Library-Portal-1-Core-WA\WAF-exercise-Library-Portal-1-Core-WA.csproj", "{C728041F-98D3-4A6B-A6F9-F7BB2E7C934F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WAF-exercise-Library-Portal-1-Core-Db", "WAF-exercise-Library-Portal-1-Core-Db\WAF-exercise-Library-Portal-1-Core-Db.csproj", "{B055F16E-E44E-4BB0-8C03-3DBCF70A2B7D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{C728041F-98D3-4A6B-A6F9-F7BB2E7C934F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C728041F-98D3-4A6B-A6F9-F7BB2E7C934F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C728041F-98D3-4A6B-A6F9-F7BB2E7C934F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B055F16E-E44E-4BB0-8C03-3DBCF70A2B7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B055F16E-E44E-4BB0-8C03-3DBCF70A2B7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B055F16E-E44E-4BB0-8C03-3DBCF70A2B7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B055F16E-E44E-4BB0-8C03-3DBCF70A2B7D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

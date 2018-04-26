@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
+using WAF_exercise_Library_Portal_1_Core_Db;
 
 namespace WAF_exercise_Library_Portal_1_Core_WA
 {
@@ -21,6 +21,23 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<LibraryDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 3;
+                options.Password.RequiredUniqueChars = 0;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+            })
+            .AddEntityFrameworkStores<LibraryDbContext>()
+            .AddDefaultTokenProviders();
+
+            services.AddTransient<LibraryDbContext>();
+
             services.AddMvc();
         }
 
@@ -37,7 +54,11 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseStatusCodePages();
+
             app.UseStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
@@ -45,6 +66,9 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            DbInitializer.Initialize(app.ApplicationServices.GetRequiredService<LibraryDbContext>(),
+                "cover_images");
         }
     }
 }
