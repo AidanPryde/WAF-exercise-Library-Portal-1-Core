@@ -16,10 +16,6 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
         [MaxLength(50)]
         public String Name { get; set; }
 
-        [Required]
-        [MaxLength(250)]
-        public String Address { get; set; }
-
         public ICollection<Lending> Lendings { get; set; }
     }
 }

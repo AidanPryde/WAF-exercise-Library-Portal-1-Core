@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -32,5 +33,10 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
 
         public ICollection<BookAuthor> BookAuthors { get; set; }
         public ICollection<Volume> Volumes { get; set; }
+
+        public String GetFristAuthorName()
+        {
+            return BookAuthors.First().Author.Name;
+        }
     }
 }

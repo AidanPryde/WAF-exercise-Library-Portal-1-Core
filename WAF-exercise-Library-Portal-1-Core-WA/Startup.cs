@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using WAF_exercise_Library_Portal_1_Core_Db;
+using WAF_exercise_Library_Portal_1_Core_WA.Services;
 
 namespace WAF_exercise_Library_Portal_1_Core_WA
 {
@@ -13,9 +15,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
     {
         public Startup(IConfiguration configuration)
         {
-            
-
-
             Configuration = configuration;
         }
 
@@ -29,19 +28,34 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
 
             services.AddIdentity<ApplicationUser, IdentityRole<int>>(options =>
             {
-                options.Password.RequireDigit = false;
-                options.Password.RequiredLength = 3;
-                options.Password.RequiredUniqueChars = 0;
-                options.Password.RequireLowercase = false;
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
                 options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = false;
+                options.Password.RequiredUniqueChars = 3;
+
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                options.Lockout.MaxFailedAccessAttempts = 10;
+                options.Lockout.AllowedForNewUsers = true;
+
+                options.User.RequireUniqueEmail = true;
             })
             .AddEntityFrameworkStores<LibraryDbContext>()
             .AddDefaultTokenProviders();
 
-            services.AddTransient<LibraryDbContext>();
+            services.AddTransient<ILibraryService, LibraryService>();
+            //services.AddTransient<LibraryDbContext>();
 
             services.AddMvc();
+
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(15);
+                options.Cookie.HttpOnly = true;
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,6 +71,8 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseSession();
+
             app.UseStatusCodePages();
 
             app.UseStaticFiles();
@@ -71,7 +87,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
             });
 
             DbInitializer.Initialize(app.ApplicationServices.GetRequiredService<LibraryDbContext>(),
-                "Data\\cover_images");
+                "Data\\Images\\Covers");
         }
     }
 }

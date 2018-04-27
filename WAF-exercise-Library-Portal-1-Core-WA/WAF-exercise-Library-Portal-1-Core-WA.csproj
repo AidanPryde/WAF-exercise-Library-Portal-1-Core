@@ -20,4 +20,8 @@
     <ProjectReference Include="..\WAF-exercise-Library-Portal-1-Core-Db\WAF-exercise-Library-Portal-1-Core-Db.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
+  </ItemGroup>
+
 </Project>

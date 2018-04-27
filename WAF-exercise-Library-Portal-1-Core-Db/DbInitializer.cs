@@ -16,7 +16,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
 
             if (context.Book.Any())
             {
-                return; // Az adatbázis már inicializálva van.
+                return;
             }
 
             SeedAuthor();
@@ -24,8 +24,6 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
             SeedBook();
             SeedVolume();
             SeedBookAuthor();
-
-            //_context.SaveChanges();
         }
 
         private static void SeedAuthor()

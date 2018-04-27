@@ -1,24 +1,8 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
-}
-
-/* Wrapping element */
-/* Set some basic padding to keep content from hitting the edges */
-.body-content {
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
+﻿
 /* Carousel */
 .carousel-caption p {
     font-size: 20px;
     line-height: 1.4;
-}
-
-/* Make .svg files in the carousel display properly in older browsers */
-.carousel-inner .item img[src$=".svg"] {
-    width: 100%;
 }
 
 /* QR code generator */
@@ -32,4 +16,230 @@
     .carousel-caption {
         display: none;
     }
+}
+
+body {
+    font-family: Arial, sans-serif;
+    font-size: 10pt;
+    color: #000000;
+    background-color: #ffffff;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    color: #ffffff;
+    text-align: left;
+    background-color: #333399;
+    border-bottom: 1pt solid #000000;
+    height: 50pt;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+div.headerAdmin {
+    font-weight: bold;
+    position: relative;
+    float: right;
+    padding: 5pt;
+}
+
+    div.headerAdmin td {
+        padding: 2pt 5pt 2pt 5pt;
+    }
+
+    div.headerAdmin a {
+        color: #ccccff;
+        text-decoration: underline;
+    }
+
+        div.headerAdmin a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+div.headerText {
+    float: left;
+}
+
+    div.headerText h1 {
+        font-size: x-large;
+        padding: 8pt 0 2pt 8pt;
+        margin: 0;
+    }
+
+    div.headerText h3 {
+        font-size: small;
+        text-decoration: none;
+        padding: 0;
+        padding-left: 8pt;
+        margin: 0;
+    }
+
+div.content {
+    padding-top: 1em;
+}
+
+.contentText {
+    font-size: 12pt;
+    font-weight: bold;
+    line-height: 14pt;
+    vertical-align: top;
+}
+
+div.content h3 {
+    font-size: medium;
+    text-decoration: none;
+    padding: 5pt 0 5pt 0;
+    margin: 0;
+}
+
+.contentTD {
+    vertical-align: top;
+}
+
+.rightColumn {
+    position: absolute;
+    margin-top: 20pt;
+    margin-left: 20pt;
+    text-align: left;
+    padding-bottom: 20pt;
+}
+
+
+tr.bookItem {
+    vertical-align: top;
+}
+
+div.bookItemHead {
+    font-size: 12pt;
+    font-weight: bold;
+    line-height: 14pt;
+    vertical-align: top;
+    text-decoration: underline;
+    padding-bottom: 5pt;
+}
+
+    div.bookItemHead a {
+        font-weight: bold;
+        text-decoration: underline;
+        color: #000000;
+    }
+
+        div.bookItemHead a:hover {
+            font-weight: bold;
+            text-decoration: underline;
+            color: #333399;
+        }
+
+div.bookItemContent {
+    font-size: 10pt;
+}
+
+.contentHead {
+    font-size: 12pt;
+    font-weight: bold;
+    line-height: 14pt;
+    vertical-align: top;
+    text-decoration: none;
+    padding-bottom: 5pt;
+    padding-top: 10pt;
+}
+
+.contentBody {
+    font-size: 10pt;
+    margin-bottom: 1em;
+}
+
+div.contentComment {
+    text-align: left;
+    border-top: 2pt solid #333399;
+    padding-top: 4pt;
+    margin-top: 10pt;
+}
+
+    div.contentComment a {
+        text-decoration: none;
+    }
+
+.contentPrice {
+    text-align: right;
+}
+
+.contentImage {
+    border: 1pt solid #000000;
+    margin: 5pt;
+    width: 215px;
+}
+
+a.contentLink {
+    font-weight: bold;
+    text-decoration: underline;
+    color: #000000;
+}
+
+    a.contentLink:hover {
+        font-weight: bold;
+        text-decoration: underline;
+        color: #333399;
+    }
+
+.button {
+    border: 1pt solid #000000;
+    background-color: #333399;
+    padding: 2pt 4pt 2pt 4pt;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.welcomeMessage {
+    text-align: right;
+    padding: 5pt 5pt 15pt 5pt;
+}
+
+fieldset {
+    margin: 1em 0;
+    padding: 1em;
+    border: 1px solid #ccc;
+}
+
+    fieldset p {
+        margin: 2px 12px 10px 10px;
+    }
+
+    .login label, .register label, .changePassword label {
+        display: block;
+    }
+
+    fieldset .inline {
+        display: inline;
+    }
+
+legend {
+    font-weight: bold;
+    padding: 2px 4px 8px 4px;
+}
+
+.textEntry {
+    width: 320px;
+    border: 1px solid #ccc;
+}
+
+.passwordEntry {
+    width: 320px;
+    border: 1px solid #ccc;
+}
+
+.failureNotification {
+    align-content: center;
+    font-size: 100%;
+    font-weight: bold;
+    line-height: 14pt;
+    color: Red;
+    vertical-align: top;
+    text-decoration: none;
+    padding-bottom: 5pt;
+    padding-top: 10pt;
 }
