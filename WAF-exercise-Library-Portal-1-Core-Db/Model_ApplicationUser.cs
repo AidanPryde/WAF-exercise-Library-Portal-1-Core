@@ -9,7 +9,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
     {
         public ApplicationUser()
         {
-            Lending = new HashSet<Lending>();
+            Lendings = new HashSet<Lending>();
         }
 
         [Required]
@@ -20,6 +20,6 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
         [MaxLength(250)]
         public String Address { get; set; }
 
-        public ICollection<Lending> Lending { get; set; }
+        public ICollection<Lending> Lendings { get; set; }
     }
 }

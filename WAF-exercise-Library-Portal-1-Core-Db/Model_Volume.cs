@@ -9,7 +9,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
     {
         public Volume()
         {
-            Lending = new HashSet<Lending>();
+            Lendings = new HashSet<Lending>();
         }
 
         [Key]
@@ -21,6 +21,6 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
 
         public virtual Book Book { get; set; }
 
-        public ICollection<Lending> Lending { get; set; }
+        public ICollection<Lending> Lendings { get; set; }
     }
 }

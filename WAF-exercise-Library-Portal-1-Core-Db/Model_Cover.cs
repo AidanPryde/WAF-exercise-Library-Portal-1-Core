@@ -8,7 +8,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
     {
         public Cover()
         {
-            Book = new HashSet<Book>();
+            Books = new HashSet<Book>();
         }
 
         [Key]
@@ -17,6 +17,6 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
         [Required]
         public Byte[] Image { get; set; }
 
-        public ICollection<Book> Book { get; set; }
+        public ICollection<Book> Books { get; set; }
     }
 }

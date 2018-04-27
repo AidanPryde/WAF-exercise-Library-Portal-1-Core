@@ -9,8 +9,8 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
     {
         public Book()
         {
-            BookAuthor = new HashSet<BookAuthor>();
-            Volume = new HashSet<Volume>();
+            BookAuthors = new HashSet<BookAuthor>();
+            Volumes = new HashSet<Volume>();
         }
 
         [Key]
@@ -30,7 +30,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
 
         public virtual Cover Cover { get; set; }
 
-        public ICollection<BookAuthor> BookAuthor { get; set; }
-        public ICollection<Volume> Volume { get; set; }
+        public ICollection<BookAuthor> BookAuthors { get; set; }
+        public ICollection<Volume> Volumes { get; set; }
     }
 }

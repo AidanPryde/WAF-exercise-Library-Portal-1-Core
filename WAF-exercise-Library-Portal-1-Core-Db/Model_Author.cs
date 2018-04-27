@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.Design;
+using System.ComponentModel;
 
 namespace WAF_exercise_Library_Portal_1_Core_Db
 {
@@ -8,7 +11,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
     {
         public Author()
         {
-            BookAuthor = new HashSet<BookAuthor>();
+            BookAuthors = new HashSet<BookAuthor>();
         }
 
         [Key]
@@ -16,8 +19,9 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
 
         [Required]
         [MaxLength(50)]
+        /*[Index("INDEX_AUTHOR_NAME", IsClustered = false, IsUnique = true)]*/
         public String Name { get; set; }
 
-        public ICollection<BookAuthor> BookAuthor { get; set; }
+        public ICollection<BookAuthor> BookAuthors { get; set; }
     }
 }

@@ -13,6 +13,9 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
     {
         public Startup(IConfiguration configuration)
         {
+            
+
+
             Configuration = configuration;
         }
 
@@ -68,7 +71,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
             });
 
             DbInitializer.Initialize(app.ApplicationServices.GetRequiredService<LibraryDbContext>(),
-                "cover_images");
+                "Data\\cover_images");
         }
     }
 }
