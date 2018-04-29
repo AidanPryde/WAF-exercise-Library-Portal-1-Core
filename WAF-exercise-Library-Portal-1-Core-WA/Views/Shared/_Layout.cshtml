@@ -32,10 +32,9 @@
                 The library, that will be your favourite.
             </h3>
         </div>
-    </div>
-    <div class="headerAdmin">
-        @if (ViewBag.CurrentApplicationUserName == null)
-        {
+        <div class="headerAdmin">
+            @if (ViewBag.CurrentApplicationUserName == null)
+            {
             <table>
                 <tr>
                     <td>
@@ -46,9 +45,9 @@
                     </td>
                 </tr>
             </table>
-        }
-        else
-        {
+            }
+            else
+            {
             <table>
                 <tr>
                     <td colspan="2">
@@ -63,12 +62,11 @@
                 </tr>
                 <tr></tr>
             </table>
-        }
+            }
+        </div>
     </div>
     <div class="content">
-        <div class="rightColumn">
-            @RenderBody()
-        </div>
+        @RenderBody()
     </div>
 
     @RenderSection("Scripts", required: false)

@@ -1,0 +1,52 @@
+﻿@using WAF_exercise_Library_Portal_1_Core_Db;
+
+@model Book;
+
+<h2>Details</h2>
+
+@if (Model == null)
+{
+    <div class="contentText">No volums at all.</div>
+}
+else
+{
+    <h1>@Model.Title</h1>
+    <img src="@Url.Action("ImageForBookCover", new {bookId = Model.Id})" class="contentImage" />
+    <p>
+        @foreach (BookAuthor bookAuthor in Model.BookAuthors)
+        {
+            <span>◘@bookAuthor.Author.Name◘</span>
+        }
+    </p>
+    <p>[@Model.Isbn] @Model.PublishedYear</p>
+
+    @foreach (Volume volume in Model.Volumes)
+    {
+        <p>
+            @volume.Id
+            @if (String.IsNullOrEmpty(ViewBag.CurrentApplicationUserName))
+            {
+                <a asp-controller="Account" asp-action="Login">Login for place a lending</a>
+            }
+            else
+            {
+                <a asp-controller="Lending" asp-action="Index" asp-route-id="@volume.Id">Place a lending</a>
+            }
+        </p>
+        <ul>
+            @foreach (Lending lending in volume.GetRelevantLendings().OrderBy(l => l.StartDate))
+            {
+                <li>
+                    @lending.StartDate - @lending.EndDate
+                    @if (lending.ApplicationUser.UserName == ViewBag.CurrentApplicationUserName && lending.Active == 0)
+                    {
+                        <form asp-controller="Lending" asp-action="Remove">
+                            <input type="hidden" name="id" value="@lending.Id" />
+                            <input type="submit" value="Remove the lending" class="button" />
+                        </form>
+                    }
+                </li>
+            }
+        </ul>
+    }
+}

@@ -1,41 +1,59 @@
-﻿@using WAF_exercise_Library_Portal_1_Core_Db;
-
-@model IList<Book>
-
-@if (Model == null || !Model.Any())
+﻿@model SearchViewModel
+@if (ViewBag.Books == null)
 {
     <div class="contentText">At the moment we have no books.</div>
 }
 else
 {
-    <div>
-        
+    @if (ViewBag.PagingTab != null)
+    {
+        <div class="paging">
+            @for (Int32 index = 0; index < ViewBag.PagingTab.Count; index += 1)
+            {
+                <a asp-action="Index" asp-route-paging="@index" asp-route-order="@ViewBag.Order" asp-route-Title="@Model.Title" asp-route-Author="@Model.Author">@ViewBag.PagingTab[index][0] - @ViewBag.PagingTab[index][1]</a>
+            }
+        </div>
+    }
+    <div class="searching">
+        <form asp-controller="Home" asp-action="Index" method="get">
+            Title:<input asp-for="Title" />
+            <span asp-validation-for="Title"></span>
+            Author:<input asp-for="Author" />
+            <span asp-validation-for="Author"></span>
+            Order by
+            <input type="radio" name="order" value="false" checked="@(ViewBag.Order == false)" /> popularity
+            <input type="radio" name="order" value="true" checked="@(ViewBag.Order == true)" /> title<br>
+            <input type="hidden" id="paging" name="paging" value="@ViewBag.Paging" /><br>
+            <input type="submit" value="Search" class="button" />
+        </form>
     </div>
-    <table>
-        @for (Int32 i = 0; i < (Model.Count + 1) / 2; i++)
+    <div class="rightColumn">
+        <table>
+            @for (Int32 i = 0; i < (ViewBag.Books.Count + 1) / 2; i++)
         {
             <tr>
-                @for (Int32 j = i * 2; j < i * 2 + 2 && j < Model.Count; j++)
-                {
-                    <td class="contentTD">
-                        <table border="0" width="550">
-                            <tr class="bookItem">
-                                <td width="227px">
-                                    <img src="@Url.Action("ImageForBookCover", new {bookId = Model[j].Id})" class="contentImage" />
-                                </td>
-                                <td>
-                                    <div class="bookItemHead">
-                                        <a asp-action="Details" asp-route-buildingId="@Model[j].Id">@Model[j].Title</a><br><br>
-                                        by @Model[j].GetFristAuthorName()<br>
-                                        published in @Model[j].PublishedYear<br>
-                                        [ISBN:@Model[j].Isbn]
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                }
-            </tr>
+                @for (Int32 j = i * 2; j < i * 2 + 2 && j < ViewBag.Books.Count; j++)
+            {
+                <td class="contentTD">
+                    <table border="0" width="550">
+                        <tr class="bookItem">
+                            <td width="227px">
+                                <img src="@Url.Action("ImageForBookCover", new {bookId = ViewBag.Books[j].Id})" class="contentImage" />
+                            </td>
+                            <td>
+                                <div class="bookItemHead">
+                                    <a asp-action="Details" asp-route-bookId="@ViewBag.Books[j].Id" target="_blank">@ViewBag.Books[j].Title</a><br><br>
+                                    by @ViewBag.Books[j].GetFristAuthorName()<br>
+                                    published in @ViewBag.Books[j].PublishedYear<br>
+                                    [ISBN:@ViewBag.Books[j].Isbn]
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
         }
-    </table>
+            </tr>
+    }
+        </table>
+    </div>
 }

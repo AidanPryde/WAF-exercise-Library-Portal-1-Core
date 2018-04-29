@@ -1,0 +1,60 @@
+﻿@using WAF_exercise_Library_Portal_1_Core_WA.Models;
+
+@model LendingViewModel
+
+@if (String.IsNullOrEmpty(ViewBag.Result) == false)
+{
+    <p>@ViewBag.Result</p>
+    <a asp-controller="Home" asp-action="Details" asp-route-bookId="@ViewBag.ReturnBookId">Back to the book</a>
+}
+<form asp-controller="Lending" asp-action="Add">
+    <table>
+        <tr>
+            <td colspan="2">
+                <div asp-validation-summary="ModelOnly" class="failureNotification"></div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div class="contentHead">
+                    Interval:
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td width="120">
+                Start date:
+            </td>
+            <td class="failureNotification">
+                <input asp-for="StartDate" />
+                <span asp-validation-for="StartDate"></span>
+            </td>
+        </tr>
+        <tr>
+            <td width="120">
+                End date:
+            </td>
+            <td class="failureNotification">
+                <input asp-for="EndDate" />
+                <span asp-validation-for="EndDate"></span>
+            </td>
+        </tr>
+        <tr>
+            <td width="120">
+                Voluem Id:
+            </td>
+            <td class="failureNotification">
+                <input asp-for="VolumeId" />
+                <span asp-validation-for="VolumeId"></span>
+            </td>
+        </tr>
+    </table>
+    <input type="submit" value="Add lending" class="button" />
+</form>
+
+@section Scripts
+    {
+    @{ Html.RenderPartial("_ValidationScriptsPartial"); }
+}
+
+

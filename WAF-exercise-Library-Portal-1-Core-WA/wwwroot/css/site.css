@@ -243,3 +243,11 @@ legend {
     padding-bottom: 5pt;
     padding-top: 10pt;
 }
+
+.paging {
+    text-align: center;
+}
+
+.searching {
+    text-align: center;
+}

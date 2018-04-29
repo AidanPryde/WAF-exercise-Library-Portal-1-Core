@@ -38,5 +38,23 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
         {
             return BookAuthors.First().Author.Name;
         }
+
+        public Int32 CountValidLendings()
+        {
+            Int32 sum = 0;
+
+            foreach (Volume volume in Volumes)
+            {
+                foreach (Lending lending in volume.Lendings)
+                {
+                    if (lending.IsValidLending())
+                    {
+                        sum += 1;
+                    }
+                }
+            }
+
+            return sum;
+        }
     }
 }

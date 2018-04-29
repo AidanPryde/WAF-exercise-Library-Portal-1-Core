@@ -66,12 +66,12 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
 
             ApplicationUser applicationUser = new ApplicationUser
             {
-                UserName = user.Username,
+                UserName = user.ApplicationUserUsername,
                 Email = user.ApplicationUserEmail,
                 Name = user.ApplicationUserName,
                 PhoneNumber = user.ApplicationUserPhoneNumber
             };
-            var result = await _userManager.CreateAsync(applicationUser, user.UserPassword);
+            var result = await _userManager.CreateAsync(applicationUser, user.ApplicationUserPassword);
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
