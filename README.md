@@ -38,6 +38,16 @@ Készítsük el egy könyvtár online kölcsönzői és nyilvántartó rendszer�
 
 * A látogatók regisztrációt (név, telefonszám, e-mail cím, felhasználónév, jelszó, megerősített jelszó) és bejelentkezést követően előjegyzést adhatnak le egy kötetre, a kölcsönzés tervezett kezdő és befejező napját megadva. Az előjegyzés nem fedhet át aktív kölcsönzéssel vagy más előjegyzéssel.
 
+(2.) részfeladat: a könyvtárosok az asztali grafikus felületen keresztül adminisztrálhatják a könyveket és a kölcsönzéseket.
+
+* A könyvtáros bejelentkezhet (felhasználónév és jelszó megadásával) a programba, illetve kijelentkezhet; a további funkcionalitások csak bejelentkezett állapotban elérhetőek.
+
+* Az alkalmazás listázza a könyveket, valamint a hozzájuk tartozó köteteket. Lehetőség van új könyv, illetve kötet rögzítésére.
+
+* A könyvtáros selejtezhet egy kötetet, de csak akkor, ha nincsen aktuálisan kikölcsönözve. Az esedékes jövőbeni előjegyzések törlésre kerülnek és az adott kötet továbbá nem lesz kölcsönözhető.
+
+* Az alkalmazás listázza az aktív kölcsönzéseket és a jövőben esedékes előjegyzéseket. A könyvtáros egy aktív kölcsönzést inaktívvá tehet (visszavitték a könyvet), valamint egy inaktív előjegyzést aktív kölcsönzésnek jelölhet (elvitték a könyvet). Egy kölcsönzés státuszának változtatása nincs a tervezett kezdő és befejező naphoz kötve (gondolva pl. a késedelmes visszavitelre), azonban egykötetnek egyszerre legfeljebb egy aktív kölcsönzése lehet.
+
 Az adatbázis az alábbi adatokat tárolja:
 * könyvek (cím, szerző, kiadás éve, ISBN szám, borítókép);
 * kötetek (könyv, könyvtári azonosító);
