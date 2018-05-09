@@ -25,8 +25,8 @@
             <td width="120">
                 Start date:
             </td>
-            <td class="failureNotification">
-                <input asp-for="StartDate" />
+            <td height="45" class="failureNotification">
+                <input asp-for="StartDate" size="23"/>
                 <span asp-validation-for="StartDate"></span>
             </td>
         </tr>
@@ -34,8 +34,8 @@
             <td width="120">
                 End date:
             </td>
-            <td class="failureNotification">
-                <input asp-for="EndDate" />
+            <td height="45" class="failureNotification">
+                <input asp-for="EndDate" size="23" />
                 <span asp-validation-for="EndDate"></span>
             </td>
         </tr>
@@ -43,9 +43,8 @@
             <td width="120">
                 Voluem Id:
             </td>
-            <td class="failureNotification">
-                <input asp-for="VolumeId" />
-                <span asp-validation-for="VolumeId"></span>
+            <td colspan="2" height="45" class="failureNotification">
+                <input asp-for="VolumeId" size="37"/>
             </td>
         </tr>
     </table>

@@ -22,16 +22,17 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
         {
             IEnumerable<Book> books = _libraryService.NarrowBooksByAuthorAndTitle(searchViewModel.Author, searchViewModel.Title);
 
+            Int32 booksCount = books.Count(b => true);
             Int32 currentPaging = paging ?? 0;
             Boolean currentOrder = order ?? false;
             Int32 pagingSize = 20;
 
-            if (currentPaging > books.Count() - 1)
+            if (currentPaging * pagingSize > booksCount - 1)
             {
-                currentPaging = books.Count() - 1;
+                currentPaging = (booksCount / pagingSize);
             }
 
-            List<Int32[]> pagingTab = CalculatePaging(books.Count());
+            List<Int32[]> pagingTab = CalculatePaging(booksCount);
 
             if (currentOrder)
             {
@@ -87,6 +88,13 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
             Int32 to = total > pageSize ? pageSize : total;
 
             List<Int32[]> pagingTab = new List<Int32[]>();
+
+            if (total == 0)
+            {
+                pagingTab.Add(new Int32[] { 0, 0 });
+
+                return pagingTab;
+            }
 
             while (to < total)
             {

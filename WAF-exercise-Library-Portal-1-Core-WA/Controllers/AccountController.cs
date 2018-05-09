@@ -69,7 +69,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
                 UserName = user.ApplicationUserUsername,
                 Email = user.ApplicationUserEmail,
                 Name = user.ApplicationUserName,
-                PhoneNumber = user.ApplicationUserPhoneNumber
+                PhoneNumber = user.ApplicationUserPhoneNumber,
             };
             var result = await _userManager.CreateAsync(applicationUser, user.ApplicationUserPassword);
             if (!result.Succeeded)

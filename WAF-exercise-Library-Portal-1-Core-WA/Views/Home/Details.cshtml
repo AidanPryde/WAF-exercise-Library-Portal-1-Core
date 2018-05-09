@@ -23,7 +23,7 @@ else
     @foreach (Volume volume in Model.Volumes)
     {
         <p>
-            @volume.Id
+            Volume [@volume.Id]:
             @if (String.IsNullOrEmpty(ViewBag.CurrentApplicationUserName))
             {
                 <a asp-controller="Account" asp-action="Login">Login for place a lending</a>
@@ -34,11 +34,11 @@ else
             }
         </p>
         <ul>
-            @foreach (Lending lending in volume.GetRelevantLendings().OrderBy(l => l.StartDate))
+            @foreach (Lending lending in volume.GetRelevantLendings())
             {
                 <li>
                     @lending.StartDate - @lending.EndDate
-                    @if (lending.ApplicationUser.UserName == ViewBag.CurrentApplicationUserName && lending.Active == 0)
+                    @if (lending.IsApplicationUserActiveLanding(ViewBag.CurrentApplicationUserName))
                     {
                         <form asp-controller="Lending" asp-action="Remove">
                             <input type="hidden" name="id" value="@lending.Id" />

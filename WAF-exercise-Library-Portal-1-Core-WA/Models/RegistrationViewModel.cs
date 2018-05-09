@@ -20,7 +20,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Models
         public String ApplicationUserPhoneNumber { get; set; }
 
         [Required(ErrorMessage = "You must fill out the username field.")]
-        [RegularExpression("^[A-Za-z0-9_-]{5,40}$", ErrorMessage = "The given username has a wrong format, or too long.")]
+        [RegularExpression("^[A-Za-z0-9_-]{5,40}$", ErrorMessage = "The given username has a wrong format, or too short.")]
         public String ApplicationUserUsername { get; set; }
 
         [Required(ErrorMessage = "You must fill out the password field.")]

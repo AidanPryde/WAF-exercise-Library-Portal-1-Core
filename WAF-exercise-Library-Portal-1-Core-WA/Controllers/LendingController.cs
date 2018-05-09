@@ -26,15 +26,15 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
             if (String.IsNullOrEmpty(id))
                 return RedirectToAction("Index", "Home");
 
-            Volume volume = _libraryService.GetVolumeByVolumeId(id);
-
-            if (volume == null)
-                return RedirectToAction("Index", "Home");
-
             if (User.Identity.IsAuthenticated == false)
             {
                 return RedirectToAction("Index", "Home");
             }
+
+            Volume volume = _libraryService.GetVolumeByVolumeId(id);
+
+            if (volume == null)
+                return RedirectToAction("Index", "Home");
 
             lendingViewModel.StartDate = DateTime.UtcNow.AddDays(1);
             lendingViewModel.EndDate = lendingViewModel.StartDate.AddDays(7);
@@ -55,8 +55,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
 
             if (User.Identity.IsAuthenticated == false)
             {
-                ViewBag.Result = "Something went wrong.";
-                return View("Index", lendingViewModel);
+                return RedirectToAction("Index", "Home");
             }
 
             ApplicationUser applicationUser = await _userManager.FindByNameAsync(User.Identity.Name);

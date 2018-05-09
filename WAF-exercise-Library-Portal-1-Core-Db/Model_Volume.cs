@@ -28,7 +28,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
         {
             DateTime now = DateTime.UtcNow;
 
-            return Lendings.Where(l => l.StartDate > now || l.EndDate > now);
+            return Lendings.Where(l => (l.StartDate > now || l.EndDate > now)).OrderBy(l => l.StartDate);
         }
     }
 }

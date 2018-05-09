@@ -2,7 +2,7 @@
 
 @model LoginViewModel
 <form asp-controller="Account" asp-action="Login">
-    <table>
+    <table class="login">
         <tr>
             <td colspan="2">
                 <div asp-validation-summary="ModelOnly" class="failureNotification"></div>
@@ -19,7 +19,7 @@
             <td width="120">
                 Username:
             </td>
-            <td class="failureNotification">
+            <td height="45" class="failureNotification">
                 <input asp-for="Username" />
                 <span asp-validation-for="Username"></span>
             </td>
@@ -28,7 +28,7 @@
             <td width="120">
                 Passwrod:
             </td>
-            <td class="failureNotification">
+            <td height="45" class="failureNotification">
                 <input asp-for="UserPassword" />
                 <span asp-validation-for="UserPassword"></span>
             </td>

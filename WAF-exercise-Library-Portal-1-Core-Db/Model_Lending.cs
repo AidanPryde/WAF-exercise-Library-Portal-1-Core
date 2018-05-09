@@ -83,7 +83,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
             }
         }
 
-        public Boolean IsValidLending()
+        public Boolean IsFinishedReturnedLending()
         {
             LendingState lendingState = this.GetState();
 
@@ -95,6 +95,11 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
             }
 
             return false;
+        }
+
+        public Boolean IsApplicationUserActiveLanding(String applicationUserName)
+        {
+            return ApplicationUser.UserName == applicationUserName && Active == 0;
         }
     }
 }

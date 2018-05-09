@@ -45,15 +45,16 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
             .AddDefaultTokenProviders();
 
             services.AddTransient<ILibraryService, LibraryService>();
-            //services.AddTransient<LibraryDbContext>();
 
             services.AddMvc();
 
             services.AddDistributedMemoryCache();
+
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(15);
                 options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
             });
 
         }

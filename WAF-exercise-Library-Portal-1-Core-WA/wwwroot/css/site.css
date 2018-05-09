@@ -28,6 +28,11 @@ body {
     padding: 0;
 }
 
+input {
+    border: 1pt dashed black;
+    margin: 10pt 0 0 0;
+}
+
 .header {
     color: #ffffff;
     text-align: left;
@@ -109,7 +114,7 @@ div.content h3 {
 }
 
 
-tr.bookItem {
+bookItem {
     vertical-align: top;
 }
 
@@ -134,7 +139,7 @@ div.bookItemHead {
             color: #333399;
         }
 
-div.bookItemContent {
+bookItemContent {
     font-size: 10pt;
 }
 
@@ -144,6 +149,7 @@ div.bookItemContent {
     line-height: 14pt;
     vertical-align: top;
     text-decoration: none;
+    text-align: left;
     padding-bottom: 5pt;
     padding-top: 10pt;
 }
@@ -233,6 +239,7 @@ legend {
 }
 
 .failureNotification {
+    text-align: left;
     align-content: center;
     font-size: 100%;
     font-weight: bold;
@@ -240,8 +247,9 @@ legend {
     color: Red;
     vertical-align: top;
     text-decoration: none;
-    padding-bottom: 5pt;
-    padding-top: 10pt;
+    padding-bottom: 0;
+    padding-top: 0;
+    margin: 0 0 0 10pt;
 }
 
 .paging {
@@ -250,4 +258,17 @@ legend {
 
 .searching {
     text-align: center;
+}
+
+.reg {
+    margin: 0 0 0 20pt;
+}
+
+.login {
+    margin: 0 0 0 20pt;
+}
+
+.regInfo p {
+    text-align: left;
+    margin: 0 0 0 10pt;
 }

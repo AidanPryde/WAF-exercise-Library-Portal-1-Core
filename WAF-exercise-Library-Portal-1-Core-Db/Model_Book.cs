@@ -47,7 +47,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
             {
                 foreach (Lending lending in volume.Lendings)
                 {
-                    if (lending.IsValidLending())
+                    if (lending.IsFinishedReturnedLending())
                     {
                         sum += 1;
                     }
