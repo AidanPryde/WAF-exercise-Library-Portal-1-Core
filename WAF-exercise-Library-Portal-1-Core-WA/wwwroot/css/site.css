@@ -111,8 +111,16 @@ div.content h3 {
     margin-left: 20pt;
     text-align: left;
     padding-bottom: 20pt;
+    width: 100%;
 }
 
+.listTable {
+    margin: 0 auto;
+}
+
+.bookItemHeadTd {
+    display: table;
+}
 
 bookItem {
     vertical-align: top;

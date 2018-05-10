@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
-using WAF_exercise_Library_Portal_1_Core_Db;
-
+using WAF_exercise_Library_Portal_1_Core_Db.Models;
 using WAF_exercise_Library_Portal_1_Core_WA.Services;
 using WAF_exercise_Library_Portal_1_Core_WA.Models;
 
 namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
 {
+    [Authorize]
     public class LendingController : BaseController
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -60,7 +62,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
 
             ApplicationUser applicationUser = await _userManager.FindByNameAsync(User.Identity.Name);
 
-            UpdateResult updateResult = _libraryService.SaveLending(applicationUser.Id, lendingViewModel);
+            UpdateResult updateResult = await _libraryService.SaveLending(applicationUser.Id, lendingViewModel);
             if (updateResult == UpdateResult.Success)
             {
                 ViewBag.Result = "Successfully saved the lending.";
@@ -98,7 +100,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
 
             ApplicationUser applicationUser = await _userManager.FindByNameAsync(User.Identity.Name);
 
-            UpdateResult updateResult = _libraryService.RemoveLending(lendingId, applicationUser.Id);
+            UpdateResult updateResult = await _libraryService.RemoveLending(lendingId, applicationUser.Id);
             if (updateResult == UpdateResult.Success)
             {
                 ViewBag.Result = "Successfully removed the lending.";

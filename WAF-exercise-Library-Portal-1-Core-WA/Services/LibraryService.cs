@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+
 using Microsoft.EntityFrameworkCore;
 
 using WAF_exercise_Library_Portal_1_Core_Db;
+using WAF_exercise_Library_Portal_1_Core_Db.Models;
 using WAF_exercise_Library_Portal_1_Core_WA.Models;
 
 namespace WAF_exercise_Library_Portal_1_Core_WA.Services
@@ -45,15 +48,11 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
             }
         }
 
-        public IEnumerable<Volume> GetVolumes()
+        private IEnumerable<Volume> Volumes
         {
-            try
+            get
             {
-                return _context.Volume;//.Include(v => v.Lendings);
-            }
-            catch (Exception)
-            {
-                return null;
+                return _context.Volume;
             }
         }
 
@@ -174,11 +173,11 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
             }
         }
 
-        public Int32? GetBookIdByLendingId(Int32 id)
+        public async Task<Int32?> GetBookIdByLendingId(Int32 id)
         {
             try
             {
-                Lending lending = _context.Lending.Where(l => l.Id == id).Include(l => l.Volume).FirstOrDefault();
+                Lending lending = await _context.Lending.Where(l => l.Id == id).Include(l => l.Volume).FirstOrDefaultAsync();
 
                 if (lending == null)
                     return null;
@@ -195,7 +194,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
         {
             try
             {
-                return GetVolumes().Where(v => v.Id == id).FirstOrDefault();
+                return Volumes.Where(v => v.Id == id).FirstOrDefault();
             }
             catch (Exception)
             {
@@ -203,7 +202,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
             }
         }
 
-        public UpdateResult SaveLending(Int32 applicationUserId, LendingViewModel lendingViewModel)
+        public async Task<UpdateResult> SaveLending(Int32 applicationUserId, LendingViewModel lendingViewModel)
         {
             try
             {
@@ -216,7 +215,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                     VolumeId = lendingViewModel.VolumeId
                 };
 
-                Volume volume = _context.Volume.Where(v => v.Id == lending.VolumeId).Include(v => v.Lendings).FirstOrDefault();
+                Volume volume = await _context.Volume.Where(v => v.Id == lending.VolumeId).Include(v => v.Lendings).FirstOrDefaultAsync();
 
                 if (volume == null)
                     return UpdateResult.DbError;
@@ -243,10 +242,11 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                     }
                 }
 
-                _context.Lending.Add(lending);
+                await _context.Lending.AddAsync(lending);
 
-                if (_context.SaveChanges() > 0)
+                if (await _context.SaveChangesAsync() > 0)
                     return UpdateResult.Success;
+
                 return UpdateResult.DbError;
             }
             catch (Exception)
@@ -256,19 +256,20 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
             
         }
 
-        public UpdateResult RemoveLending(Int32 lendingId, Int32 applicationUserId)
+        public async Task<UpdateResult> RemoveLending(Int32 lendingId, Int32 applicationUserId)
         {
             try
             {
-                Lending lending = _context.Lending.Where(l => l.Id == lendingId && l.ApplicationUserId == applicationUserId).FirstOrDefault();
+                Lending lending = await _context.Lending.Where(l => l.Id == lendingId && l.ApplicationUserId == applicationUserId).FirstOrDefaultAsync();
 
                 if (lending == null)
                     return UpdateResult.DbError;
 
                 _context.Lending.Remove(lending);
 
-                if (_context.SaveChanges() > 0)
+                if (await _context.SaveChangesAsync() > 0)
                     return UpdateResult.Success;
+
                 return UpdateResult.DbError;
             }
             catch (Exception)

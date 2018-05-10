@@ -1,17 +1,16 @@
 ﻿using System;
 
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using WAF_exercise_Library_Portal_1_Core_Db;
 using WAF_exercise_Library_Portal_1_Core_Db.Models;
-using WAF_exercise_Library_Portal_1_Core_WA.Services;
 
-namespace WAF_exercise_Library_Portal_1_Core_WA
+namespace WAF_exercise_Library_Portal_1_Core_API
 {
     public class Startup
     {
@@ -45,8 +44,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
             })
             .AddEntityFrameworkStores<LibraryDbContext>();
 
-            services.AddTransient<ILibraryService, LibraryService>();
-
             services.AddMvc();
 
             services.AddDistributedMemoryCache();
@@ -74,18 +71,13 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
 
             app.UseSession();
 
-            app.UseStatusCodePages();
+            //app.UseStatusCodePages();
 
             app.UseStaticFiles();
 
             app.UseAuthentication();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseMvc();
 
             DbInitializer.Initialize(app.ApplicationServices.GetRequiredService<LibraryDbContext>(),
                 "Data\\Images\\Covers");

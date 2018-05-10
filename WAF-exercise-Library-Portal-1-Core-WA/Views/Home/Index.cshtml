@@ -28,7 +28,7 @@ else
         </form>
     </div>
     <div class="rightColumn">
-        <table>
+        <table class="listTable">
             @for (Int32 i = 0; i < (ViewBag.Books.Count + 1) / 2; i++)
         {
             <tr>
@@ -40,7 +40,7 @@ else
                             <td width="227px">
                                 <img src="@Url.Action("ImageForBookCover", new {bookId = ViewBag.Books[j].Id})" class="contentImage" />
                             </td>
-                            <td>
+                            <td class="bookItemHeadTd">
                                 <div class="bookItemHead">
                                     <a asp-action="Details" asp-route-bookId="@ViewBag.Books[j].Id" target="_blank">@ViewBag.Books[j].Title</a><br><br>
                                     by @ViewBag.Books[j].GetFristAuthorName()<br>

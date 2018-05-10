@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
+using WAF_exercise_Library_Portal_1_Core_Db.Models;
+
 namespace WAF_exercise_Library_Portal_1_Core_Db
 {
     public partial class LibraryDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>

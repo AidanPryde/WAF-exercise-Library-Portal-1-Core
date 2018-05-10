@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WAF-exercise-Library-Portal-1-Core-WA", "WAF-exercise-Library-Portal-1-Core-WA\WAF-exercise-Library-Portal-1-Core-WA.csproj", "{C728041F-98D3-4A6B-A6F9-F7BB2E7C934F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WAF-exercise-Library-Portal-1-Core-WA", "WAF-exercise-Library-Portal-1-Core-WA\WAF-exercise-Library-Portal-1-Core-WA.csproj", "{C728041F-98D3-4A6B-A6F9-F7BB2E7C934F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WAF-exercise-Library-Portal-1-Core-Db", "WAF-exercise-Library-Portal-1-Core-Db\WAF-exercise-Library-Portal-1-Core-Db.csproj", "{B055F16E-E44E-4BB0-8C03-3DBCF70A2B7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WAF-exercise-Library-Portal-1-Core-Db", "WAF-exercise-Library-Portal-1-Core-Db\WAF-exercise-Library-Portal-1-Core-Db.csproj", "{B055F16E-E44E-4BB0-8C03-3DBCF70A2B7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WAF-exercise-Library-Portal-1-Core-API", "WAF-exercise-Library-Portal-1-Core-API\WAF-exercise-Library-Portal-1-Core-API.csproj", "{C11BD8B7-ECB1-4449-BBBC-8E2DF82F9E50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WAF-exercise-Library-Portal-1-Core-WPF", "WAF-exercise-Library-Portal-1-Core-WPF\WAF-exercise-Library-Portal-1-Core-WPF.csproj", "{EDDB8880-0110-41F7-ACE8-A93AF8C8B759}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{B055F16E-E44E-4BB0-8C03-3DBCF70A2B7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B055F16E-E44E-4BB0-8C03-3DBCF70A2B7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B055F16E-E44E-4BB0-8C03-3DBCF70A2B7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C11BD8B7-ECB1-4449-BBBC-8E2DF82F9E50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C11BD8B7-ECB1-4449-BBBC-8E2DF82F9E50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C11BD8B7-ECB1-4449-BBBC-8E2DF82F9E50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C11BD8B7-ECB1-4449-BBBC-8E2DF82F9E50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDDB8880-0110-41F7-ACE8-A93AF8C8B759}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDDB8880-0110-41F7-ACE8-A93AF8C8B759}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDDB8880-0110-41F7-ACE8-A93AF8C8B759}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDDB8880-0110-41F7-ACE8-A93AF8C8B759}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

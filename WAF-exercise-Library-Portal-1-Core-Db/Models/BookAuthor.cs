@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace WAF_exercise_Library_Portal_1_Core_Db
+namespace WAF_exercise_Library_Portal_1_Core_Db.Models
 {
     public partial class BookAuthor
     {

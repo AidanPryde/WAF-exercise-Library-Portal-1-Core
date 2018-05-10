@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 
+using WAF_exercise_Library_Portal_1_Core_Db.Models;
 
 namespace WAF_exercise_Library_Portal_1_Core_Db
 {

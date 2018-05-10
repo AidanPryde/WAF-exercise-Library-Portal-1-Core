@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
-using WAF_exercise_Library_Portal_1_Core_Db;
+using WAF_exercise_Library_Portal_1_Core_Db.Models;
 using WAF_exercise_Library_Portal_1_Core_WA.Models;
 
 namespace WAF_exercise_Library_Portal_1_Core_WA.Services
@@ -25,10 +26,10 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
         IEnumerable<Book> NarrowBooksSelection(IEnumerable<Book> books, Int32 from, Int32 pagingSize = 20);
         Book GetBookByBookId(Int32 id);
         Int32? GetBookIdByVolumeId(String id);
-        Int32? GetBookIdByLendingId(Int32 id);
+        Task<Int32?> GetBookIdByLendingId(Int32 id);
         Volume GetVolumeByVolumeId(String id);
 
-        UpdateResult SaveLending(Int32 applicationUserId, LendingViewModel lending);
-        UpdateResult RemoveLending(Int32 lendingId, Int32 applicationUserId);
+        Task<UpdateResult> SaveLending(Int32 applicationUserId, LendingViewModel lending);
+        Task<UpdateResult> RemoveLending(Int32 lendingId, Int32 applicationUserId);
     }
 }

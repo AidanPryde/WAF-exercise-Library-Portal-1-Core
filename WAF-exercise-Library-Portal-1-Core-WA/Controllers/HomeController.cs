@@ -5,7 +5,7 @@ using System.Linq;
 
 using Microsoft.AspNetCore.Mvc;
 
-using WAF_exercise_Library_Portal_1_Core_Db;
+using WAF_exercise_Library_Portal_1_Core_Db.Models;
 using WAF_exercise_Library_Portal_1_Core_WA.Models;
 using WAF_exercise_Library_Portal_1_Core_WA.Services;
 

@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 
-using WAF_exercise_Library_Portal_1_Core_Db;
+using WAF_exercise_Library_Portal_1_Core_Db.Models;
 using WAF_exercise_Library_Portal_1_Core_WA.Services;
 using WAF_exercise_Library_Portal_1_Core_WA.Models;
 
@@ -45,6 +45,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
             if (!result.Succeeded)
             {
                 ModelState.AddModelError("", "Wrong username or password.");
+
                 return View("Login", user);
             }
 
@@ -71,15 +72,18 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
                 Name = user.ApplicationUserName,
                 PhoneNumber = user.ApplicationUserPhoneNumber,
             };
+
             var result = await _userManager.CreateAsync(applicationUser, user.ApplicationUserPassword);
             if (!result.Succeeded)
             {
                 foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
+
                 return View("Register", user);
             }
 
             await _signInManager.SignInAsync(applicationUser, false);
+
             return RedirectToAction("Index", "Home");
         }
 
