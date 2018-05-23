@@ -57,12 +57,12 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
         {
             Int32 currentBookId = bookId ?? -1;
             if (currentBookId == -1)
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(HomeController.Index));
 
             Book book = _libraryService.GetBookByBookId(currentBookId);
 
             if (book == null)
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(HomeController.Index));
 
             return View("Details", book);
         }

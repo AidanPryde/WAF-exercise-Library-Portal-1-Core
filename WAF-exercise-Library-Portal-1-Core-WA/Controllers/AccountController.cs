@@ -25,7 +25,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
 
         public IActionResult Index()
         {
-            return RedirectToAction("Login");
+            return RedirectToAction(nameof(AccountController.Login));
         }
 
         [HttpGet]
@@ -49,7 +49,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
                 return View("Login", user);
             }
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
         [HttpGet]
@@ -84,14 +84,14 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
 
             await _signInManager.SignInAsync(applicationUser, false);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
     }
 }

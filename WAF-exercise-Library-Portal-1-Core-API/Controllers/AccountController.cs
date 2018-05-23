@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using WAF_exercise_Library_Portal_1_Core_Db.Models;
-using WAF_exercise_Library_Portal_1_Core_Db.DataTransferObjects;
+using WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects;
 
 namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
 {
@@ -22,15 +22,19 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
 
         // api/Account/Login
         [HttpPost("[action]")]
-        public async Task<IActionResult> Login([FromBody] Login user)
+        public async Task<IActionResult> Login([FromBody] LoginData user)
         {
             if (_signInManager.IsSignedIn(User))
                 await _signInManager.SignOutAsync();
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(user.UserName, user.Password, isPersistent: false,
+                var result = await _signInManager.PasswordSignInAsync(
+                    user.UserName,
+                    user.Password,
+                    isPersistent: false,
                     lockoutOnFailure: false);
+
                 if (result.Succeeded)
                 {
                     return Ok();

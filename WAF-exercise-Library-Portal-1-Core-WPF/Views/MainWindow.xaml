@@ -3,10 +3,73 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WAF_exercise_Library_Portal_1_Core_WPF"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:viewModel="clr-namespace:WAF_exercise_Library_Portal_1_Core_WPF.ViewModels.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <!-- erőforrások -->
+        <x:Array Type="system:String" x:Key="shoreTypeArray">
+            <system:String>homokos</system:String>
+            <system:String>sziklás</system:String>
+            <system:String>kavicsos</system:String>
+            <system:String>aprókavicsos</system:String>
+        </x:Array>
+        <!-- átalakítók -->
+        <viewModel:BookImageConverter x:Key="bookImageConverter"/>
+    </Window.Resources>
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="35" />
+            <RowDefinition Height="110" />
+            <RowDefinition Height="35" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
         
+        <Menu Grid.Row="0" Grid.ColumnSpan="2">
+            <MenuItem Header="Database">
+                <MenuItem Header="Load data (server -> client)" Command="{Binding LoadCommand}" Tag="almafa"/>
+                <MenuItem Header="Save data (client -> server)" Command="{Binding SaveCommand}" IsEnabled="{Binding IsLoaded}"/>
+                <Separator />
+                <MenuItem Header="Kilépés" Command="{Binding ExitCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <DataGrid Name="bookDataGrid" Grid.Row="1" Grid.ColumnSpan="2" AutoGenerateColumns="false" IsReadOnly="True" ItemsSource="{Binding Books}" SelectedItem="{Binding SelectedBook}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Id" Binding="{Binding Id}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Title" Binding="{Binding Title}"></DataGridTextColumn>
+                <DataGridTextColumn Header="PublishedYear" Binding="{Binding PublishedYear}"></DataGridTextColumn>
+                <DataGridTextColumn Header="ISBN" Binding="{Binding Isbn}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Image" Binding="{Binding Image}"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button Content="Create" Margin="6,5,0,5" Command="{Binding CreateBookCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+            <Button Content="Edit" Margin="6,5,0,5" Command="{Binding UpdateBookCommand}" CommandParameter="{Binding SelectedBook}" Width="114" IsEnabled="{Binding IsLoaded}" />
+            <Button Content="Delete" Margin="6,5,6,5" Command="{Binding DeleteBookCommand}" CommandParameter="{Binding SelectedBook}" Width="114" IsEnabled="{Binding IsLoaded}" />
+        </StackPanel>
+
+        <ListBox Name="authorListBox" Grid.Row="3" Grid.Column="0"  ItemsSource="{Binding ElementName=bookDataGrid, Path=SelectedItem}" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel IsItemsHost="True" />
+                    <!-- megadjuk, hogy az elemeket víszintesen helyezze el -->
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Image Height="auto" Width="215" Source="{Binding Image, Converter={StaticResource bookImageConverter}}" />
+                    <!-- képmegjelenítőt használunk konverzióval -->
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
     </Grid>
 </Window>

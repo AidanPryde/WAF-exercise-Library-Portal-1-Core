@@ -26,17 +26,17 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
         public IActionResult Index(String id, LendingViewModel lendingViewModel)
         {
             if (String.IsNullOrEmpty(id))
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(nameof(HomeController.Index), "Home");
 
             if (User.Identity.IsAuthenticated == false)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(nameof(HomeController.Index), "Home");
             }
 
             Volume volume = _libraryService.GetVolumeByVolumeId(id);
 
             if (volume == null)
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(nameof(HomeController.Index), "Home");
 
             lendingViewModel.StartDate = DateTime.UtcNow.AddDays(1);
             lendingViewModel.EndDate = lendingViewModel.StartDate.AddDays(7);
@@ -57,7 +57,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
 
             if (User.Identity.IsAuthenticated == false)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(nameof(HomeController.Index), "Home");
             }
 
             ApplicationUser applicationUser = await _userManager.FindByNameAsync(User.Identity.Name);
@@ -93,7 +93,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
 
             if (User.Identity.IsAuthenticated == false)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(nameof(HomeController.Index), "Home");
             }
 
             ViewBag.ReturnBookId = _libraryService.GetBookIdByLendingId(lendingId);
