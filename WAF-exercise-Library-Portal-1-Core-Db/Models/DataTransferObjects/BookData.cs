@@ -5,6 +5,22 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
 {
     public class BookData
     {
+        public BookData()
+        {
+            Id = -1;
+
+            Authors = new List<AuthorData>();
+            Volumes = new List<VolumeData>();
+        }
+
+        public BookData(Int32 id, String title, Int32 publishedYear, Int64 isbn)
+        {
+            Id = id;
+            Title = title;
+            PublishedYear = publishedYear;
+            Isbn = isbn;
+        }
+
         public Int32 Id { get; set; }
         public String Title { get; set; }
         public Int32 PublishedYear { get; set; }
@@ -23,7 +39,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
         {
             int hash = Id;
 
-            hash = (hash * 357) + Isbn.GetHashCode();
+            hash = (hash * 357) + Id.GetHashCode();
 
             return hash;
         }

@@ -12,12 +12,16 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
     {
         Boolean IsUserLoggedIn { get; }
 
-        Task<Boolean> LoginAsync(string name, string password);
+        Task<Boolean> LoginAsync(String name, String password);
         Task<Boolean> LogoutAsync();
+
+        IReadOnlyList<BookData> Books { get; }
 
         void CreateBook(BookData bookData);
         void UpdateBook(BookData bookData);
         void DeleteBook(Int32 bookId);
+
+        event EventHandler<Int32> BookChanged;
 
         Task LoadAsync();
         Task SaveAsync();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 
@@ -35,7 +36,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels.Converters
 
         public object ConvertBack(Object value, Type targetType, Object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            return DependencyProperty.UnsetValue;
         }
     }
 }

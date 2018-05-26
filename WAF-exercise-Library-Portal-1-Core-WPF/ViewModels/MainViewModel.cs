@@ -4,18 +4,22 @@ using System.Linq;
 
 using WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects;
 using WAF_exercise_Library_Portal_1_Core_WPF.Models;
+using WAF_exercise_Library_Portal_1_Core_WPF.Persistence;
 
 namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
         private ILibraryModel _model;
+
         private ObservableCollection<BookData> _books;
         private ObservableCollection<AuthorData> _authors;
         private ObservableCollection<VolumeData> _volumes;
+
         private BookData _selectedBook;
         private AuthorData _selectedAuthor;
         private VolumeData _selectedVolume;
+
         private Boolean _isLoaded;
 
         public ObservableCollection<BookData> Books
@@ -30,7 +34,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
                 }
             }
         }
-
         public ObservableCollection<AuthorData> Authors
         {
             get { return _authors; }
@@ -43,7 +46,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
                 }
             }
         }
-
         public ObservableCollection<VolumeData> Volumes
         {
             get { return _volumes; }
@@ -70,7 +72,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             }
         }
 
-        public BookData SelectedBuilding
+        public BookData SelectedBook
         {
             get { return _selectedBook; }
             set
@@ -82,7 +84,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
                 }
             }
         }
-
         public AuthorData SelectedAuthor
         {
             get { return _selectedAuthor; }
@@ -95,7 +96,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
                 }
             }
         }
-
         public VolumeData SelectedVolume
         {
             get { return _selectedVolume; }
@@ -109,35 +109,24 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             }
         }
 
-        /// <summary>
-        /// Szerkesztett épület lekérdezése.
-        /// </summary>
-        public BookData EditedBook { get; private set; }
-
         public DelegateCommand CreateBookCommand { get; private set; }
         public DelegateCommand UpdateBookCommand { get; private set; }
         public DelegateCommand DeleteBookCommand { get; private set; }
 
-        public DelegateCommand UploadImageCommand { get; private set; }
-        public DelegateCommand DeleteImageCommand { get; private set; }
-        public DelegateCommand AddLinkImageCommand { get; private set; }
-        public DelegateCommand RemoveLinkImageCommand { get; private set; }
+        public event EventHandler<BookData> BookEditingStarted;
 
-        public DelegateCommand CreateAuthorCommand { get; private set; }
+        public DelegateCommand AddAuthorCommand { get; private set; }
         public DelegateCommand UpdateAuthorCommand { get; private set; }
-        public DelegateCommand DeleteAuthorCommand { get; private set; }
-        public DelegateCommand AddLinkAuthorCommand { get; private set; }
-        public DelegateCommand RemoveLinkAuthorCommand { get; private set; }
+        public DelegateCommand RemoveAuthorCommand { get; private set; }
 
-        public DelegateCommand CreateVolumeCommand { get; private set; }
+        public DelegateCommand AddImageCommand { get; private set; }
+        public DelegateCommand DeleteImageCommand { get; private set; }
+
+        public DelegateCommand AddVolumeCommand { get; private set; }
         public DelegateCommand UpdateVolumeCommand { get; private set; }
         public DelegateCommand DeleteVolumeCommand { get; private set; }
-        public DelegateCommand AddLinkVolumeCommand { get; private set; }
-        public DelegateCommand RemoveVolumeCommand { get; private set; }
         public DelegateCommand ShortOutVolumeCommand { get; private set; }
 
-        public DelegateCommand SaveChangesCommand { get; private set; }
-        public DelegateCommand CancelChangesCommand { get; private set; }
         public DelegateCommand ExitCommand { get; private set; }
 
         public DelegateCommand LoadCommand { get; private set; }
@@ -147,51 +136,55 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 
         public MainViewModel(ILibraryModel model)
         {
-            _model = model ?? throw new ArgumentNullException("model");
+            _model = model ?? throw new ArgumentNullException(nameof(model));
 
-            _model.BookChanged += Model_BuildingChanged;
+            _model.BookChanged += Model_BookChanged;
             _isLoaded = false;
 
             CreateBookCommand = new DelegateCommand(param =>
             {
-                EditedBook = new BookData();  // a szerkesztett épület új lesz
-                OnBookEditingStarted();
+                OnBookEditingStarted(new BookData());
             });
-            UploadImageCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
-            UpdateBookCommand = new DelegateCommand(param => UpdateBook(param as BookData));
-            DeleteBookCommand = new DelegateCommand(param => DeleteBook(param as BookData));
+
+            UpdateBookCommand = new DelegateCommand(param =>
+            {
+                BookData book = param as BookData;
+
+                if (book == null || !Books.Contains(book))
+                {
+                    return;
+                }
+
+                OnBookEditingStarted(new BookData(book.Id, book.Title, book.PublishedYear, book.Isbn));
+            });
+
+            DeleteBookCommand = new DelegateCommand(param =>
+            {
+                BookData book = param as BookData;
+
+                if (book == null || !Books.Contains(book))
+                {
+                    return;
+                }
+
+                _model.DeleteBook(book.Id);
+            });
+
+            AddAuthorCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
+            UpdateAuthorCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
+            RemoveAuthorCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
+
+            AddImageCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
             DeleteImageCommand = new DelegateCommand(param => DeleteImage(param as CoverData));
-            SaveChangesCommand = new DelegateCommand(param => SaveChanges());
-            CancelChangesCommand = new DelegateCommand(param => CancelChanges());
+
+            AddVolumeCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
+            UpdateVolumeCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
+            DeleteVolumeCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
+            ShortOutVolumeCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
+
             LoadCommand = new DelegateCommand(param => LoadAsync());
             SaveCommand = new DelegateCommand(param => SaveAsync());
             ExitCommand = new DelegateCommand(param => OnExitApplication());
-        }
-
-        private void UpdateBook(BookData book)
-        {
-            if (book == null)
-                return;
-
-            EditedBook = new BookData
-            {
-                Id = book.Id,
-                Title = book.Title,
-                PublishedYear = book.PublishedYear,
-                Isbn = book.Isbn
-            };
-
-            OnBookEditingStarted();
-        }
-
-        private void DeleteBook(BookData book)
-        {
-            if (book == null || book.Volumes.Count > 0)
-            {
-                return;
-            }
-
-            _model.DeleteBook(book);
         }
 
         /// <summary>
@@ -200,58 +193,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         /// <param name="image">A kép.</param>
         private void DeleteImage(CoverData image)
         {
-            if (image == null)
-                return;
-
-            _model.DeleteImage(image);
-        }
-
-        /// <summary>
-        /// Változtatások mentése.
-        /// </summary>
-        private void SaveChanges()
-        {
-            // ellenőrzések
-            if (String.IsNullOrEmpty(EditedBook.Name))
-            {
-                OnMessageApplication("Az épületnév nincs megadva!");
-                return;
-            }
-            if (EditedBook.City == null)
-            {
-                OnMessageApplication("A város nincs megadva!");
-                return;
-            }
-            if (EditedBook.ShoreId == null)
-            {
-                OnMessageApplication("A tengerpart típus nincs megadva!");
-                return;
-            }
-
-            // mentés
-            if (EditedBook.Id == 0) // ha új az épület
-            {
-                _model.CreateBuilding(EditedBook);
-                Authors.Add(EditedBook);
-                SelectedBuilding = EditedBook;
-            }
-            else // ha már létezik az épület
-            {
-                _model.UpdateBuilding(EditedBook);
-            }
-
-            EditedBook = null;
-
-            OnBuildingEditingFinished();
-        }
-
-        /// <summary>
-        /// Változtatások elvetése.
-        /// </summary>
-        private void CancelChanges()
-        {
-            EditedBook = null;
-            OnBuildingEditingFinished();
+            
         }
 
         /// <summary>
@@ -262,13 +204,12 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             try
             {
                 await _model.LoadAsync();
-                Authors = new ObservableCollection<BookData>(_model.Buildings); // az adatokat egy követett gyűjteménybe helyezzük
-                Volumes = new ObservableCollection<VolumeData>(_model.Cities);
+                Books = new ObservableCollection<BookData>(_model.Books);
                 IsLoaded = true;
             }
-            catch (NetworkException)
+            catch (PersistenceUnavailableException)
             {
-                OnMessageApplication("A betöltés sikertelen! Nincs kapcsolat a kiszolgálóval.");
+                OnMessageApplication("Loading failed! No connection to data.");
             }
         }
 
@@ -280,48 +221,40 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             try
             {
                 await _model.SaveAsync();
-                OnMessageApplication("A mentés sikeres!");
+                OnMessageApplication("Changes saved successfully.");
             }
-            catch (NetworkException)
+            catch (PersistenceUnavailableException)
             {
-                OnMessageApplication("A mentés sikertelen! Nincs kapcsolat a kiszolgálóval.");
+                OnMessageApplication("Saving failed! No connection to data.");
             }
         }
 
-        /// <summary>
-        /// Épület megváltozásának eseménykezelése.
-        /// </summary>
-        private void Model_BuildingChanged(object sender, BuildingEventArgs e)
+        private void Model_BookChanged(object sender, Int32 e)
         {
-            Int32 index = Authors.IndexOf(Authors.FirstOrDefault(building => building.Id == e.BuildingId));
-            Authors.RemoveAt(index); // módosítjuk a kollekciót
-            Authors.Insert(index, _model.Buildings[index]);
+            Int32 index = Books.IndexOf(Books.FirstOrDefault(b => b.Id == e));
 
-            SelectedBuilding = Authors[index]; // és az aktuális épületet
+            if (index != -1)
+            {
+                Books.RemoveAt(index);
+            }
+            else
+            {
+                index = e - 1;
+            }
+
+            Books.Insert(index, _model.Books[index]);
+
+            SelectedBook = Books[index];
         }
 
-        /// <summary>
-        /// Alkalmazásból való kilépés eseménykiváltása.
-        /// </summary>
         private void OnExitApplication()
         {
             ExitApplication?.Invoke(this, EventArgs.Empty);
         }
 
-        /// <summary>
-        /// Épület szerkesztés elindításának eseménykiváltása.
-        /// </summary>
-        private void OnBookEditingStarted()
+        private void OnBookEditingStarted(BookData bookData)
         {
-            BookEditingStarted?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// Épület szerkesztés befejeztének eseménykiváltása.
-        /// </summary>
-        private void OnBuildingEditingFinished()
-        {
-            BookEditingFinished?.Invoke(this, EventArgs.Empty);
+            BookEditingStarted?.Invoke(this, bookData);
         }
 
         /// <summary>
@@ -330,7 +263,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         /// <param name="buildingId">Épület azonosító.</param>
         private void OnImageEditingStarted(Int32 buildingId)
         {
-            ImageUploadingStarted?.Invoke(this, new BuildingEventArgs { BuildingId = buildingId });
+            //ImageUploadingStarted?.Invoke(this, new BuildingEventArgs { BuildingId = buildingId });
         }
     }
 }

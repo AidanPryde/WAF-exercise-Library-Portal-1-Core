@@ -36,7 +36,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models
 
         public String GetFristAuthorName()
         {
-            return BookAuthors.First().Author.Name;
+            return BookAuthors.FirstOrDefault()?.Author.Name;
         }
 
         public Int32 CountValidLendings()

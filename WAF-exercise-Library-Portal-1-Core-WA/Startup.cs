@@ -88,7 +88,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
             });
 
             DbInitializer.Initialize(app.ApplicationServices.GetRequiredService<LibraryDbContext>(),
-                "Data\\Images\\Covers");
+                "..\\Data\\Images\\Covers");
         }
     }
 }

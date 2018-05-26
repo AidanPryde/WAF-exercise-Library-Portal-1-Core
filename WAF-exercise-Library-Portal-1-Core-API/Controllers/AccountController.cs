@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using WAF_exercise_Library_Portal_1_Core_Db.Models;
@@ -24,36 +26,49 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Login([FromBody] LoginData user)
         {
-            if (_signInManager.IsSignedIn(User))
-                await _signInManager.SignOutAsync();
-
-            if (ModelState.IsValid)
+            try
             {
-                var result = await _signInManager.PasswordSignInAsync(
-                    user.UserName,
-                    user.Password,
-                    isPersistent: false,
-                    lockoutOnFailure: false);
-
-                if (result.Succeeded)
+                if (_signInManager.IsSignedIn(User))
                 {
-                    return Ok();
+                    await _signInManager.SignOutAsync();
                 }
 
-                ModelState.AddModelError("", "Login failed!");
+                if (ModelState.IsValid)
+                {
+                    var result = await _signInManager.PasswordSignInAsync(user.UserName, user.Password, isPersistent: false, lockoutOnFailure: false);
+
+                    if (result.Succeeded)
+                    {
+                        return Ok();
+                    }
+
+                    ModelState.AddModelError("", "Login failed!");
+                    return Unauthorized();
+                }
+                
                 return Unauthorized();
             }
-
-            return Unauthorized();
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
-        [HttpPost("Signout")]
+        // api/Account/Logout
+        [HttpGet("[action]")]
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            try
+            {
+                await _signInManager.SignOutAsync();
 
-            return Ok();
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

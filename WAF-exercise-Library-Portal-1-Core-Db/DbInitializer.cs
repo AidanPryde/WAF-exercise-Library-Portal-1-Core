@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 
+using Microsoft.AspNetCore.Identity;
+
 using WAF_exercise_Library_Portal_1_Core_Db.Models;
 
 namespace WAF_exercise_Library_Portal_1_Core_Db
@@ -10,7 +12,11 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
     {
         private static LibraryDbContext _context;
 
-        public static void Initialize(LibraryDbContext context, string coverImageDirectory)
+        private static UserManager<ApplicationUser> _userManager;
+        private static RoleManager<IdentityRole<int>> _roleManager;
+
+        public static void Initialize(LibraryDbContext context,
+            String coverImageDirectory)
         {
             _context = context;
             _context.Database.EnsureCreated();
@@ -25,6 +31,32 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
             SeedBook();
             SeedVolume();
             SeedBookAuthor();
+        }
+
+        public static void Initialize(LibraryDbContext context,
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole<int>> roleManager,
+            string coverImageDirectory)
+        {
+            _context = context;
+            _context.Database.EnsureCreated();
+
+            _userManager = userManager;
+            _roleManager = roleManager;
+
+            if (_context.Book.Any() == false)
+            {
+                SeedAuthor();
+                SeedCover(coverImageDirectory);
+                SeedBook();
+                SeedVolume();
+                SeedBookAuthor();
+            }
+
+            if (_context.Users.Any() == false)
+            {
+                SeedApplicationUsers();
+            }
         }
 
         private static void SeedAuthor()
@@ -49,13 +81,13 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
         {
             if (Directory.Exists(coverImageDirectory))
             {
-                int index = 1;
+                //int index = 1;
                 foreach (String filePath in Directory.EnumerateFiles(coverImageDirectory))
                 {
                     if (File.Exists(filePath))
                     {
                         _context.Cover.Add(new Cover() { /*Id = index,*/ Image = File.ReadAllBytes(filePath) });
-                        index += 1;
+                        //index += 1;
                     }
                 }
             }
@@ -165,6 +197,30 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
             _context.BookAuthor.Add(new BookAuthor() { /*Id = 27,*/ BookId = 25, AuthorId = 12 });
 
             _context.SaveChanges();
+        }
+
+        private static void SeedApplicationUsers()
+        {
+            var adminUser = new ApplicationUser()
+            {
+                UserName = "admin",
+                Name = "Admin",
+                Email = "admin@example.com",
+            };
+            var adminPassword = "Almafa123";
+            var adminRole = new IdentityRole<int>("admin");
+
+            CheckErrors(_userManager.CreateAsync(adminUser, adminPassword).Result);
+            CheckErrors(_roleManager.CreateAsync(adminRole).Result);
+            CheckErrors(_userManager.AddToRoleAsync(adminUser, adminRole.Name).Result);
+        }
+
+        private static void CheckErrors(IdentityResult result)
+        {
+            foreach (IdentityError error in result.Errors)
+            {
+                throw new Exception(String.Format("Error while creating users.{2}Code: {0}; Description: {1}.", error.Code, error.Description, Environment.NewLine));
+            }
         }
     }
 }

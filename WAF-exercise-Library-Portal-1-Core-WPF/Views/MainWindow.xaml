@@ -6,7 +6,7 @@
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:viewModel="clr-namespace:WAF_exercise_Library_Portal_1_Core_WPF.ViewModels.Converters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="650" Width="1000">
     <Window.Resources>
         <!-- erőforrások -->
         <x:Array Type="system:String" x:Key="shoreTypeArray">
@@ -15,19 +15,23 @@
             <system:String>kavicsos</system:String>
             <system:String>aprókavicsos</system:String>
         </x:Array>
-        <!-- átalakítók -->
         <viewModel:BookImageConverter x:Key="bookImageConverter"/>
+        <viewModel:AuthorCollectionConverter x:Key="authorCollectionConverter"/>
+        <viewModel:VolumeCollectionConverter x:Key="volumeCollectionConverter"/>
+        
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25" />
             <RowDefinition Height="*" />
             <RowDefinition Height="35" />
-            <RowDefinition Height="110" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="35" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="35" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="500" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         
@@ -46,7 +50,6 @@
                 <DataGridTextColumn Header="Title" Binding="{Binding Title}"></DataGridTextColumn>
                 <DataGridTextColumn Header="PublishedYear" Binding="{Binding PublishedYear}"></DataGridTextColumn>
                 <DataGridTextColumn Header="ISBN" Binding="{Binding Isbn}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Image" Binding="{Binding Image}"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
 
@@ -56,20 +59,30 @@
             <Button Content="Delete" Margin="6,5,6,5" Command="{Binding DeleteBookCommand}" CommandParameter="{Binding SelectedBook}" Width="114" IsEnabled="{Binding IsLoaded}" />
         </StackPanel>
 
-        <ListBox Name="authorListBox" Grid.Row="3" Grid.Column="0"  ItemsSource="{Binding ElementName=bookDataGrid, Path=SelectedItem}" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel IsItemsHost="True" />
-                    <!-- megadjuk, hogy az elemeket víszintesen helyezze el -->
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Image Height="auto" Width="215" Source="{Binding Image, Converter={StaticResource bookImageConverter}}" />
-                    <!-- képmegjelenítőt használunk konverzióval -->
-                </DataTemplate>
-            </ListBox.ItemTemplate>
+        <ListBox Name="authorListBox" Grid.Row="3" Grid.Column="0"  ItemsSource="{Binding ElementName=bookDataGrid, Path=SelectedItem.Authors}" SelectedItem="{Binding SelectedAuthor}" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            
         </ListBox>
 
+        <Image Name="bookCoverImage" Grid.Row="3" Grid.Column="1" Height="Auto" Width="215" Source="{Binding ElementName=bookDataGrid, Path=SelectedItem.Image}" />
+
+        <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal">
+            <Button Content="Add" Margin="6,5,0,5" Command="{Binding AddAuthorCommand}" CommandParameter="{Binding SelectedBook}" Width="114" IsEnabled="{Binding IsLoaded}" />
+            <Button Content="Edit" Margin="6,5,0,5" Command="{Binding UpdateAuthorCommand}" CommandParameter="{Binding SelectedAuthor}" Width="114" IsEnabled="{Binding IsLoaded}" />
+            <Button Content="Remove" Margin="6,5,0,5" Command="{Binding RemoveAuthorCommand}" CommandParameter="{Binding SelectedBook}" Width="114" IsEnabled="{Binding IsLoaded}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+            <Button Content="Add" Margin="6,5,0,5" Command="{Binding AddImageCommand}" CommandParameter="{Binding SelectedBook}" Width="114" IsEnabled="{Binding IsLoaded}" />
+            <Button Content="Delete" Margin="6,5,6,5" Command="{Binding DeleteImageCommand}" CommandParameter="{Binding SelectedBook}" Width="114" IsEnabled="{Binding IsLoaded}" />
+        </StackPanel>
+
+        <ListBox Name="volumeListBox" Grid.Row="5" Grid.ColumnSpan="2" ItemsSource="{Binding ElementName=bookDataGrid, Path=SelectedItem.Volumes}" SelectedItem="{Binding SelectedVolume}" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+
+        <StackPanel Grid.Row="6" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <Button Content="Add" Margin="6,5,0,5" Command="{Binding AddVolumeCommand}" CommandParameter="{Binding SelectedBook}" Width="114" IsEnabled="{Binding IsLoaded}" />
+            <Button Content="Edit" Margin="6,5,0,5" Command="{Binding UpdateVolumeCommand}" CommandParameter="{Binding SelectedVolume}" Width="114" IsEnabled="{Binding IsLoaded}" />
+            <Button Content="Delete" Margin="6,5,6,5" Command="{Binding DeleteVolumeCommand}" CommandParameter="{Binding SelectedVolume}" Width="114" IsEnabled="{Binding IsLoaded}" />
+            <Button Content="Sorting Out" Margin="6,5,6,5" Command="{Binding ShortOutVolumeCommand}" CommandParameter="{Binding SelectedVolume}" Width="114" IsEnabled="{Binding IsLoaded}" />
+        </StackPanel>
     </Grid>
 </Window>

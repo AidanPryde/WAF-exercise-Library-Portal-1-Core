@@ -8,6 +8,20 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
     public class LoginViewModel : BaseViewModel
     {
         private readonly ILibraryModel _model;
+        private Boolean _isReady = true;
+
+        public Boolean IsReady
+        {
+            get { return _isReady; }
+            private set
+            {
+                if (_isReady != value)
+                {
+                    _isReady = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public DelegateCommand ExitCommand { get; private set; }
         public DelegateCommand LoginCommand { get; private set; }
@@ -22,7 +36,8 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         {
             _model = model ?? throw new ArgumentNullException("model");
 
-            UserName = String.Empty;
+            //UserName = String.Empty;
+            UserName = "mpesko";
 
             ExitCommand = new DelegateCommand(param => OnExitApplication());
             LoginCommand = new DelegateCommand(param => LoginAsync(param as PasswordBox));
@@ -30,8 +45,16 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 
         private async void LoginAsync(PasswordBox passwordBox)
         {
+            if (IsReady == false)
+            {
+                return;
+            }
+
+            IsReady = false;
+
             if (passwordBox == null)
             {
+                IsReady = true;
                 return;
             }
 
@@ -48,10 +71,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
                     OnLoginFailed();
                 }
             }
-            catch (NetworkException ex)
-            {
-                OnMessageApplication($"Unexpected error occurred! ({ex.Message})");
-            }
             catch (Exception ex)
             {
                 String msg = ex.Message;
@@ -65,6 +84,8 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 
                 OnMessageApplication($"Unexpected error occurred!{Environment.NewLine}{msg}");
             }
+
+            IsReady = true;
         }
 
         private void OnLoginSuccess()

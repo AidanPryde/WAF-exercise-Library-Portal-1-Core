@@ -85,7 +85,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models
 
         public Boolean IsFinishedReturnedLending()
         {
-            LendingState lendingState = this.GetState();
+            LendingState lendingState = GetState();
 
             if (lendingState == LendingState.RETURNED
              || lendingState == LendingState.PICKED_UP

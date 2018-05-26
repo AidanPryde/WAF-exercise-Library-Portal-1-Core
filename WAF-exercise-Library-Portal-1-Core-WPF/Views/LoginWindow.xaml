@@ -23,6 +23,6 @@
 
         <Button Content="Login" Command="{Binding LoginCommand}"
                 CommandParameter="{Binding ElementName=PasswordBox}" HorizontalAlignment="Left" Margin="132,144,0,0"
-                VerticalAlignment="Top" Width="123" Height="38" />
+                VerticalAlignment="Top" Width="123" Height="38" IsEnabled="{Binding IsReady}"/>
     </Grid>
 </Window>
