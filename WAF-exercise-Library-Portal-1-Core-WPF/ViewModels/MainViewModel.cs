@@ -5,6 +5,7 @@ using System.Linq;
 using WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects;
 using WAF_exercise_Library_Portal_1_Core_WPF.Models;
 using WAF_exercise_Library_Portal_1_Core_WPF.Persistence;
+using WAF_exercise_Library_Portal_1_Core_WPF.ViewModels.ComplexEventArgs;
 
 namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 {
@@ -13,8 +14,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         private ILibraryModel _model;
 
         private ObservableCollection<BookData> _books;
-        private ObservableCollection<AuthorData> _authors;
-        private ObservableCollection<VolumeData> _volumes;
 
         private BookData _selectedBook;
         private AuthorData _selectedAuthor;
@@ -30,30 +29,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
                 if (_books != value)
                 {
                     _books = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public ObservableCollection<AuthorData> Authors
-        {
-            get { return _authors; }
-            private set
-            {
-                if (_authors != value)
-                {
-                    _authors = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public ObservableCollection<VolumeData> Volumes
-        {
-            get { return _volumes; }
-            private set
-            {
-                if (_volumes != value)
-                {
-                    _volumes = value;
                     OnPropertyChanged();
                 }
             }
@@ -119,13 +94,19 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         public DelegateCommand UpdateAuthorCommand { get; private set; }
         public DelegateCommand RemoveAuthorCommand { get; private set; }
 
-        public DelegateCommand AddImageCommand { get; private set; }
-        public DelegateCommand DeleteImageCommand { get; private set; }
+        public event EventHandler<AuthorEditingEventArgs> AuthorEditingStarted;
+
+        public DelegateCommand AddCoverCommand { get; private set; }
+        public DelegateCommand DeleteCoverCommand { get; private set; }
+
+        public event EventHandler<CoverEditingEventArgs> CoverEditingStarted;
 
         public DelegateCommand AddVolumeCommand { get; private set; }
         public DelegateCommand UpdateVolumeCommand { get; private set; }
         public DelegateCommand DeleteVolumeCommand { get; private set; }
         public DelegateCommand ShortOutVolumeCommand { get; private set; }
+
+        public event EventHandler<VolumeEditingEventArgs> VolumeEditingStarted;
 
         public DelegateCommand ExitCommand { get; private set; }
 
@@ -141,41 +122,16 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             _model.BookChanged += Model_BookChanged;
             _isLoaded = false;
 
-            CreateBookCommand = new DelegateCommand(param =>
-            {
-                OnBookEditingStarted(new BookData());
-            });
+            CreateBookCommand = new DelegateCommand(param => CreateBook());
+            UpdateBookCommand = new DelegateCommand(param => UpdateBook(param as BookData));
+            DeleteBookCommand = new DelegateCommand(param => DeleteBook(param as BookData));
 
-            UpdateBookCommand = new DelegateCommand(param =>
-            {
-                BookData book = param as BookData;
+            AddAuthorCommand = new DelegateCommand(param => AddAuthor());
+            UpdateAuthorCommand = new DelegateCommand(param => UpdateAuthor(param as AuthorData));
+            RemoveAuthorCommand = new DelegateCommand(param => RemoveAuthor(param as AuthorData));
 
-                if (book == null || !Books.Contains(book))
-                {
-                    return;
-                }
-
-                OnBookEditingStarted(new BookData(book.Id, book.Title, book.PublishedYear, book.Isbn));
-            });
-
-            DeleteBookCommand = new DelegateCommand(param =>
-            {
-                BookData book = param as BookData;
-
-                if (book == null || !Books.Contains(book))
-                {
-                    return;
-                }
-
-                _model.DeleteBook(book.Id);
-            });
-
-            AddAuthorCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
-            UpdateAuthorCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
-            RemoveAuthorCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
-
-            AddImageCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
-            DeleteImageCommand = new DelegateCommand(param => DeleteImage(param as CoverData));
+            AddCoverCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
+            DeleteCoverCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
 
             AddVolumeCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
             UpdateVolumeCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
@@ -187,49 +143,47 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             ExitCommand = new DelegateCommand(param => OnExitApplication());
         }
 
-        /// <summary>
-        /// Kép törlése.
-        /// </summary>
-        /// <param name="image">A kép.</param>
-        private void DeleteImage(CoverData image)
+        private void CreateBook()
         {
-            
+            OnBookEditingStarted(new BookData());
         }
-
-        /// <summary>
-        /// Betöltés végrehajtása.
-        /// </summary>
-        private async void LoadAsync()
+        private void UpdateBook(BookData bookData)
         {
+            if (bookData == null || Books.Contains(bookData) == false)
+            {
+                return;
+            }
+
+            OnBookEditingStarted(new BookData(bookData.Id, bookData.Title, bookData.PublishedYear, bookData.Isbn, bookData.Cover));
+        }
+        private void DeleteBook(BookData bookData)
+        {
+            if (bookData == null
+             || Books.Contains(bookData) == false
+             || bookData.AuthorDatas.Any()
+             || bookData.Cover != null
+             || bookData.VolumeDatas.Any())
+            {
+                return;
+            }
+
             try
             {
-                await _model.LoadAsync();
-                Books = new ObservableCollection<BookData>(_model.Books);
-                IsLoaded = true;
+                _model.DeleteBook(bookData);
+
+                Books.Remove(bookData);
             }
-            catch (PersistenceUnavailableException)
+            catch (Exception exception)
             {
-                OnMessageApplication("Loading failed! No connection to data.");
+                OnMessageApplication(String.Format("Failed to DELETE book.{0}Info: {1}", Environment.NewLine, exception.Message));
             }
         }
 
-        /// <summary>
-        /// Mentés végreahajtása.
-        /// </summary>
-        private async void SaveAsync()
+        private void OnBookEditingStarted(BookData bookData)
         {
-            try
-            {
-                await _model.SaveAsync();
-                OnMessageApplication("Changes saved successfully.");
-            }
-            catch (PersistenceUnavailableException)
-            {
-                OnMessageApplication("Saving failed! No connection to data.");
-            }
+            BookEditingStarted?.Invoke(this, bookData);
         }
-
-        private void Model_BookChanged(object sender, Int32 e)
+        private void Model_BookChanged(Object sender, Int32 e)
         {
             Int32 index = Books.IndexOf(Books.FirstOrDefault(b => b.Id == e));
 
@@ -247,15 +201,93 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             SelectedBook = Books[index];
         }
 
+        private void AddAuthor()
+        {
+            if (SelectedBook == null || Books.Contains(SelectedBook) == false)
+            {
+                return;
+            }
+
+            OnAuthorEditingStarted(new AuthorData(), SelectedBook.Id);
+        }
+        private void UpdateAuthor(AuthorData authorData)
+        {
+            if (SelectedBook == null
+             || Books.Contains(SelectedBook) == false
+             || authorData == null
+             || Books.First(b => b.Equals(SelectedBook.Id)).AuthorDatas.Contains(authorData) == false)
+            {
+                return;
+            }
+
+            OnAuthorEditingStarted(authorData, SelectedBook.Id);
+        }
+        private void RemoveAuthor(AuthorData authorData)
+        {
+            if (SelectedBook == null
+             || Books.Contains(SelectedBook) == false
+             || authorData == null)
+            {
+                return;
+            }
+
+            BookData book = Books.First(b => b.Equals(SelectedBook.Id));
+
+            if (book.AuthorDatas.Contains(authorData) == false)
+            {
+                return;
+            }
+
+            try
+            {
+                _model.RemoveAuthor(authorData, book.Id);
+            }
+            catch (Exception exception)
+            {
+                OnMessageApplication(String.Format("Failed to DELETE book.{0}Info: {1}", Environment.NewLine, exception.Message));
+            }
+        }
+
+        private void OnAuthorEditingStarted(AuthorData authorData, Int32 bookId)
+        {
+            AuthorEditingStarted?.Invoke(this, new AuthorEditingEventArgs(authorData, bookId));
+        }
+
+        private async void LoadAsync()
+        {
+            try
+            {
+                await _model.LoadAsync();
+
+                Books = new ObservableCollection<BookData>(_model.Books);
+
+                IsLoaded = true;
+            }
+            catch (PersistenceUnavailableException)
+            {
+                OnMessageApplication("Loading failed! No connection to data.");
+            }
+        }
+
+        private async void SaveAsync()
+        {
+            try
+            {
+                await _model.SaveAsync();
+                OnMessageApplication("Changes saved successfully.");
+            }
+            catch (PersistenceUnavailableException)
+            {
+                OnMessageApplication("Saving failed! No connection to data.");
+            }
+        }
+
         private void OnExitApplication()
         {
             ExitApplication?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnBookEditingStarted(BookData bookData)
-        {
-            BookEditingStarted?.Invoke(this, bookData);
-        }
+        
 
         /// <summary>
         /// Képszerkesztés elindításának eseménykiváltása.

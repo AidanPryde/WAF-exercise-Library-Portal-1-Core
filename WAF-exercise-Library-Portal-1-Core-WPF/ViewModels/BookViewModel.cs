@@ -12,7 +12,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
     public class BookViewModel : BaseViewModel
     {
         private ILibraryModel _model;
-        //private BookData _bookData;
 
         public BookData EditedBook { get; private set; }
 
@@ -26,24 +25,61 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             _model = model ?? throw new ArgumentNullException(nameof(model));
             EditedBook = bookData;
 
-            SaveCommand = new DelegateCommand((param) =>
+            SaveCommand = new DelegateCommand((param) => Save());
+            CancelCommand = new DelegateCommand((param) => Cancel());
+        }
+
+        private void Save()
+        {
+            if (String.IsNullOrEmpty(EditedBook.Title))
             {
-                if (EditedBook.Id == -1)
+                OnMessageApplication(String.Format("Failed to CREATE book.{0}Info: Invalid TITLE.", Environment.NewLine));
+                return;
+            }
+
+            if (EditedBook.Isbn.ToString().Length < 8)
+            {
+                OnMessageApplication(String.Format("Failed to CREATE book.{0}Info: Invalid ISBN.", Environment.NewLine));
+                return;
+            }
+
+            if (EditedBook.PublishedYear.ToString().Length < 4)
+            {
+                OnMessageApplication(String.Format("Failed to CREATE book.{0}Info: Invalid PUBLISHEDYEAR.", Environment.NewLine));
+                return;
+            }
+
+            if (EditedBook.Id == -1)
+            {
+                try
                 {
                     _model.CreateBook(EditedBook);
                 }
-                else
+                catch (Exception exception)
+                {
+                    OnMessageApplication(String.Format("Failed to CREATE book.{0}Info: {1}", Environment.NewLine, exception.Message));
+                    return;
+                }
+            }
+            else
+            {
+                try
                 {
                     _model.UpdateBook(EditedBook);
                 }
+                catch (Exception exception)
+                {
+                    OnMessageApplication(String.Format("Failed to UPDATE book.{0}Info: {1}", Environment.NewLine, exception.Message));
+                    return;
+                }
+            }
 
-                OnBookEditingFinished();
-            });
+            OnBookEditingFinished();
+        }
 
-            CancelCommand = new DelegateCommand((param) =>
-            {
-                OnBookEditingFinished();
-            });
+        private void Cancel()
+        {
+            OnBookEditingFinished();
         }
 
         private void OnBookEditingFinished()

@@ -11,27 +11,28 @@ using WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects;
 namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
 {
     [Produces("application/json")]
-    [Route("api/[controller]")]
-    public class VolumesController : Controller
+    [Route("api/BookAuthors")]
+    public class BookAuthorsController : Controller
     {
         private readonly LibraryDbContext _context;
 
-        public VolumesController(LibraryDbContext context)
+        public BookAuthorsController(LibraryDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        // GET: api/Volumes
+        // GET: api/Authors
         [HttpGet]
         public IActionResult Get()
         {
             try
             {
                 return Ok(_context
-                        .Volume
+                        .BookAuthor
                         .ToList()
-                        .Select(v => new VolumeData(v.Id
-                            , new BookData(v.BookId))));
+                        .Select(ba => new BookAuthorData(ba.Id,
+                        new BookData(ba.BookId),
+                        new AuthorData(ba.AuthorId))));
             }
             catch
             {
@@ -39,51 +40,30 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-        
-        // GET: api/Volumes/5
+
+        // GET: api/BookAuthors/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
             return "value";
         }
         
-        // POST: api/Volumes
+        // POST: api/BookAuthors
         [HttpPost]
         public void Post([FromBody]string value)
         {
         }
         
-        // PUT: api/Volumes/5
+        // PUT: api/BookAuthors/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody]string value)
         {
         }
 
-        // DELETE: api/Volumes/5
+        // DELETE: api/BookAuthors/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
-        }
-
-        // GET: api/Volumes/BookId/5
-        [HttpGet("BookId/{id}")]
-        public IActionResult GetWhereBookId(Int32 id)
-        {
-            try
-            {
-                return Ok(_context
-                        .Volume
-                        .Where(v => v.BookId == id)
-                        .ToList()
-                        .Select(v => new VolumeData(v.Id,
-                            new BookData(v.BookId)
-                        )));
-            }
-            catch
-            {
-                // Internal Server Error
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
         }
     }
 }

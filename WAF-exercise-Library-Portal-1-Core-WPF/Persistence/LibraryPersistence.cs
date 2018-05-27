@@ -32,7 +32,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
                 throw new PersistenceUnavailableException(exception);
             }
         }
-
         public async Task<Boolean> LogoutAsync()
         {
             try
@@ -54,24 +53,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
                 HttpResponseMessage response = await _client.GetAsync("api/Books");
                 if (response.IsSuccessStatusCode)
                 {
-                    IEnumerable<BookData> books = await response.Content.ReadAsAsync<IEnumerable<BookData>>();
-
-                    foreach (BookData book in books)
-                    {
-                        response = await _client.GetAsync("api/Authors/BookId/" + book.Id);
-                        if (response.IsSuccessStatusCode)
-                        {
-                            book.Authors = (await response.Content.ReadAsAsync<IEnumerable<AuthorData>>()).ToList();
-                        }
-
-                        response = await _client.GetAsync("api/Volumes/BookId/" + book.Id);
-                        if (response.IsSuccessStatusCode)
-                        {
-                            book.Volumes = (await response.Content.ReadAsAsync<IEnumerable<VolumeData>>()).ToList();
-                        }
-                    }
-
-                    return books;
+                    return await response.Content.ReadAsAsync<IEnumerable<BookData>>();
                 }
                 else
                 {
@@ -83,8 +65,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
                 throw new PersistenceUnavailableException(exception);
             }
         }
-
-        public async Task<Boolean> CreateBuildingAsync(BookData bookData)
+        public async Task<Boolean> CreateBookAsync(BookData bookData)
         {
             try
             {
@@ -97,13 +78,187 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
                 throw new PersistenceUnavailableException(exception);
             }
         }
+        public async Task<Boolean> UpdateBookAsync(BookData bookData)
+        {
+            try
+            {
+                HttpResponseMessage response = await _client.PutAsJsonAsync("api/Books/", bookData);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
+        }
+        public async Task<Boolean> DeleteBookAsync(BookData bookData)
+        {
+            try
+            {
+                HttpResponseMessage response = await _client.DeleteAsync("api/Books/" + bookData.Id);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
+        }
 
-        public Task<Boolean> UpdateBuildingAsync(BookData bookData)
+        public async Task<IEnumerable<BookAuthorData>> ReadBookAuthorsAsync()
+        {
+            try
+            {
+                HttpResponseMessage response = await _client.GetAsync("api/BookAuthors");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsAsync<IEnumerable<BookAuthorData>>();
+                }
+                else
+                {
+                    throw new PersistenceUnavailableException("Service returned response: " + response.StatusCode);
+                }
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
+        }
+
+        public Task<bool> AddBookAuthorAsync(BookAuthorData bookAuthorData)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<bool> RemoveBookAuthorAsync(BookAuthorData bookAuthorData)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Boolean> DeleteBuildingAsync(BookData bookData)
+        public async Task<IEnumerable<AuthorData>> ReadAuthorsAsync()
+        {
+            try
+            {
+                HttpResponseMessage response = await _client.GetAsync("api/Authors");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsAsync<IEnumerable<AuthorData>>();
+                }
+                else
+                {
+                    throw new PersistenceUnavailableException("Service returned response: " + response.StatusCode);
+                }
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
+        }
+        public Task<Boolean> AddAuthorAsync(AuthorData authorData)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<Boolean> UpdateAuthorAsync(AuthorData authorData)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<Boolean> RemoveAuthorAsync(AuthorData authorData)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<CoverData>> ReadCoversAsync()
+        {
+            try
+            {
+                HttpResponseMessage response = await _client.GetAsync("api/Covers");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsAsync<IEnumerable<CoverData>>();
+                }
+                else
+                {
+                    throw new PersistenceUnavailableException("Service returned response: " + response.StatusCode);
+                }
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
+        }
+        public Task<Boolean> AddCoverAsync(CoverData coverData)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<Boolean> DeleteCoverAsync(CoverData coverData)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<VolumeData>> ReadVolumesAsync()
+        {
+            try
+            {
+                HttpResponseMessage response = await _client.GetAsync("api/Volumes");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsAsync<IEnumerable<VolumeData>>();
+                }
+                else
+                {
+                    throw new PersistenceUnavailableException("Service returned response: " + response.StatusCode);
+                }
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
+        }
+        public Task<Boolean> AddVolumeAsync(VolumeData volumeData)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<Boolean> UpdateVolumeAsync(VolumeData volumeData)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<Boolean> RemoveVolumeAsync(VolumeData volumeData)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<Boolean> SortOutVolumeAsync(VolumeData volumeData)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<LendingData>> ReadLendingsAsync()
+        {
+            try
+            {
+                HttpResponseMessage response = await _client.GetAsync("api/Lendings");
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsAsync<IEnumerable<LendingData>>();
+                }
+                else
+                {
+                    throw new PersistenceUnavailableException("Service returned response: " + response.StatusCode);
+                }
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
+        }
+
+        public Task<bool> AddLendingAsync(LendingData volumeData)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> UpdateLendingAsync(LendingData volumeData)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> RemoveLendingAsync(LendingData volumeData)
         {
             throw new NotImplementedException();
         }

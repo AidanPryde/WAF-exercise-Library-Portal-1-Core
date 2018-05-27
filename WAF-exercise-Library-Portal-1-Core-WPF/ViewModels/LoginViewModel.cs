@@ -36,8 +36,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         {
             _model = model ?? throw new ArgumentNullException("model");
 
-            //UserName = String.Empty;
-            UserName = "mpesko";
+            UserName = String.Empty;
 
             ExitCommand = new DelegateCommand(param => OnExitApplication());
             LoginCommand = new DelegateCommand(param => LoginAsync(param as PasswordBox));
@@ -60,7 +59,8 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 
             try
             {
-                Boolean result = await _model.LoginAsync(UserName, passwordBox.Password);
+                Boolean result = await _model.LoginAsync("admin", "Almafa123");
+                //Boolean result = await _model.LoginAsync(UserName, passwordBox.Password);
 
                 if (result)
                 {

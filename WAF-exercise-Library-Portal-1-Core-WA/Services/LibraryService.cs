@@ -68,7 +68,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                 if (bookId == null)
                     return null;
 
-                Book book = _context.Book.Where(b => bookId == b.Id).FirstOrDefault();
+                Book book = _context.Book.FirstOrDefault(b => bookId == b.Id);
 
                 if (book == null)
                     return null;
@@ -78,7 +78,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                 if (coderId == null)
                     return null;
 
-                Cover cover = _context.Cover.Where(c => coderId == c.Id).FirstOrDefault();
+                Cover cover = _context.Cover.FirstOrDefault(c => coderId == c.Id);
 
                 if (cover == null)
                     return null;
@@ -122,7 +122,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                 {
                     author = author.ToLower();
 
-                    return BooksWithAuthors.Where(b => (b.BookAuthors.Where(ba => ba.Author.Name.ToLower().Contains(author)).Any()));
+                    return BooksWithAuthors.Where(b => (b.BookAuthors.Any(ba => ba.Author.Name.ToLower().Contains(author))));
                 }
 
                 return BooksWithAuthors;
@@ -149,7 +149,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
         {
             try
             {
-                return BooksWithAll.Where(b => b.Id == id).FirstOrDefault();
+                return BooksWithAll.FirstOrDefault(b => b.Id == id);
             }
             catch (Exception)
             {
@@ -194,7 +194,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
         {
             try
             {
-                return Volumes.Where(v => v.Id == id).FirstOrDefault();
+                return Volumes.FirstOrDefault(v => v.Id == id);
             }
             catch (Exception)
             {
@@ -260,7 +260,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
         {
             try
             {
-                Lending lending = await _context.Lending.Where(l => l.Id == lendingId && l.ApplicationUserId == applicationUserId).FirstOrDefaultAsync();
+                Lending lending = await _context.Lending.FirstOrDefaultAsync(l => l.Id == lendingId && l.ApplicationUserId == applicationUserId);
 
                 if (lending == null)
                     return UpdateResult.DbError;

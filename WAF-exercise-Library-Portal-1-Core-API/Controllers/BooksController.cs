@@ -12,7 +12,7 @@ using WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects;
 
 namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
 {
-    //[Produces("application/json")]
+    [Produces("application/json")]
     [Route("api/[controller]")]
     public class BooksController : Controller
     {
@@ -31,16 +31,13 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
             {
                 return Ok(_context
                         .Book
-                        .Include(b => b.Cover)
                         .ToList()
-                        .Select(b => new BookData
-                {
-                    Id = b.Id,
-                    Title = b.Title,
-                    Isbn = b.Isbn,
-                    PublishedYear = b.PublishedYear,
-                    Image = b.Cover?.Image
-                }));
+                        .Select(b => new BookData(b.Id,
+                            b.Title,
+                            b.PublishedYear,
+                            b.Isbn,
+                            b.CoverId == null ? null : new CoverData(b.CoverId ?? throw new Exception())
+                        )));
             }
             catch
             {
@@ -50,7 +47,7 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
         }
 
         // GET: api/Books/5
-        [HttpGet("{id}", Name = "GetBook")]
+        [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
             try
@@ -59,14 +56,13 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                         .Book
                         .Where(b => b.Id == id)
                         .ToList()
-                        .Select(b => new BookData
-                        {
-                            Id = b.Id,
-                            Title = b.Title,
-                            Isbn = b.Isbn,
-                            PublishedYear = b.PublishedYear,
-                            Image = b.Cover?.Image
-                        })
+                        .Select(b => new BookData(b.Id,
+                            b.Title,
+                            b.PublishedYear,
+                            b.Isbn,
+                            new CoverData(b.Id,
+                                b.Cover?.Image) 
+                        ))
                         .Single());
             }
             catch
@@ -104,16 +100,60 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
             }
         }
         
-        // PUT: api/Books/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        // PUT: api/Books
+        [HttpPut]
+        [Authorize(Roles = "admin")]
+        public IActionResult Put([FromBody] BookData bookData)
         {
+            try
+            {
+                Book book = _context.Book.FirstOrDefault(b => b.Equals(bookData.Id));
+
+                if (book == null)
+                {
+                    return NotFound();
+                }
+
+                book.Title = bookData.Title;
+                book.PublishedYear = bookData.PublishedYear;
+                book.Isbn = bookData.Isbn;
+
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            catch
+            {
+                // Internal Server Error
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
         
         // DELETE: api/Books/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        [Authorize(Roles = "admin")]
+        public IActionResult Delete(Int32 id)
         {
+            try
+            {
+                Book book = _context.Book.FirstOrDefault(b => b.Equals(id));
+
+                if (book == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Book.Remove(book);
+
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            catch
+            {
+                // Internal Server Error
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
 {
@@ -7,21 +8,38 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
         public Int32 Id { get; set; }
         public String Name { get; set; }
 
-        public override bool Equals(object obj)
+        public IList<BookData> BookDatas { get; set; }
+
+        public AuthorData()
+        {
+            Id = -1;
+        }
+
+        public AuthorData(Int32 id)
+        {
+            Id = id;
+        }
+
+        public AuthorData(Int32 id, String name) : this(id)
+        {
+            Name = name;
+        }
+
+        public override Boolean Equals(Object obj)
         {
             return (obj is AuthorData ad) && Id == ad.Id;
         }
 
-        public override int GetHashCode()
+        public override Int32 GetHashCode()
         {
-            int hash = Id;
+            Int32 hash = Id;
 
             hash = (hash * 654) + Id.GetHashCode();
 
             return hash;
         }
 
-        public override string ToString()
+        public override String ToString()
         {
             return Name;
         }

@@ -9,7 +9,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels.Converters
 {
     public class BookImageConverter : IValueConverter
     {
-        public object Convert(Object value, Type targetType, Object parameter, CultureInfo culture)
+        public Object Convert(Object value, Type targetType, Object parameter, CultureInfo culture)
         {
             if ((value is Byte[]) == false)
             {
@@ -34,7 +34,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels.Converters
             }
         }
 
-        public object ConvertBack(Object value, Type targetType, Object parameter, CultureInfo culture)
+        public Object ConvertBack(Object value, Type targetType, Object parameter, CultureInfo culture)
         {
             return DependencyProperty.UnsetValue;
         }

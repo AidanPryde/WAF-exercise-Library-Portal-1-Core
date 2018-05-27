@@ -10,7 +10,7 @@ using WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects;
 
 namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
 {
-    //[Produces("application/json")]
+    [Produces("application/json")]
     [Route("api/[controller]")]
     public class AuthorsController : Controller
     {
@@ -30,11 +30,9 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                 return Ok(_context
                         .Author
                         .ToList()
-                        .Select(a => new AuthorData
-                        {
-                            Id = a.Id,
-                            Name = a.Name
-                        }));
+                        .Select(a => new AuthorData(a.Id,
+                            a.Name
+                        )));
             }
             catch
             {

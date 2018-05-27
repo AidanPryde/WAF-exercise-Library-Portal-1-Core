@@ -71,8 +71,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Persistence\ILibraryPersistence.cs" />
+    <Compile Include="Persistence\LibraryPersistence.cs" />
+    <Compile Include="Persistence\PersistenceUnavailableException.cs" />
     <Compile Include="ViewModels\AuthorViewModel.cs" />
     <Compile Include="ViewModels\BookViewModel.cs" />
+    <Compile Include="ViewModels\ComplexEventArgs\AuthorEditingEventArgs.cs" />
+    <Compile Include="ViewModels\ComplexEventArgs\CoverEditingEventArgs.cs" />
+    <Compile Include="ViewModels\ComplexEventArgs\VolumeEditingEventArgs.cs" />
     <Compile Include="ViewModels\Converters\AuthorCollectionConverter.cs" />
     <Compile Include="ViewModels\Converters\VolumeCollectionConverter.cs" />
     <Compile Include="ViewModels\VolumeViewModel.cs" />
@@ -101,15 +107,12 @@
     </Compile>
     <Compile Include="Models\ILibraryModel.cs" />
     <Compile Include="Models\LibraryModel.cs" />
-    <Compile Include="Persistence\PersistenceUnavailableException.cs" />
-    <Compile Include="Persistence\ILibraryPersistence.cs" />
-    <Compile Include="Persistence\LibraryPersistence.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\Converters\BookImageConverter.cs" />
     <Compile Include="ViewModels\DelegateCommand.cs" />
     <Compile Include="ViewModels\ImageHandler.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
-    <Compile Include="ViewModels\MessageEventArgs.cs" />
+    <Compile Include="ViewModels\ComplexEventArgs\MessageEventArgs.cs" />
     <Compile Include="Views\AuthorWindow.xaml.cs">
       <DependentUpon>AuthorWindow.xaml</DependentUpon>
     </Compile>
@@ -145,6 +148,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -162,5 +166,6 @@
       <Name>WAF-exercise-Library-Portal-1-Core-Db</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

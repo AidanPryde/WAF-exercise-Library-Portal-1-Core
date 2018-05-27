@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
+namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels.ComplexEventArgs
 {
     public class MessageEventArgs : EventArgs
     {
