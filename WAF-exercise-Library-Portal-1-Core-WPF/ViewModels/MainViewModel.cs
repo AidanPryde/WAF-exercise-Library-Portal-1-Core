@@ -13,27 +13,88 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
     {
         private ILibraryModel _model;
 
-        private ObservableCollection<BookData> _books;
-
-        private BookData _selectedBook;
-        private AuthorData _selectedAuthor;
-        private VolumeData _selectedVolume;
-
-        private Boolean _isLoaded;
-
-        public ObservableCollection<BookData> Books
+        private ObservableCollection<BookData> _bookDatas;
+        public ObservableCollection<BookData> BookDatas
         {
-            get { return _books; }
+            get { return _bookDatas; }
             private set
             {
-                if (_books != value)
+                if (_bookDatas != value)
                 {
-                    _books = value;
+                    _bookDatas = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        private BookData _selectedBookData;
+        public BookData SelectedBookData
+        {
+            get { return _selectedBookData; }
+            set
+            {
+                if (_selectedBookData != value)
+                {
+                    _selectedBookData = value;
                     OnPropertyChanged();
                 }
             }
         }
 
+        private ObservableCollection<AuthorData> _authorDatas;
+        public ObservableCollection<AuthorData> AuthorDatas
+        {
+            get { return _authorDatas; }
+            private set
+            {
+                if (_authorDatas != value)
+                {
+                    _authorDatas = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        private AuthorData _selectedAuthorData;
+        public AuthorData SelectedAuthorData
+        {
+            get { return _selectedAuthorData; }
+            set
+            {
+                if (_selectedAuthorData != value)
+                {
+                    _selectedAuthorData = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        private AuthorData _selectedAddingAuthorData;
+        public AuthorData SelectedAddingAuthorData
+        {
+            get { return _selectedAddingAuthorData; }
+            set
+            {
+                if (_selectedAddingAuthorData != value)
+                {
+                    _selectedAddingAuthorData = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private VolumeData _selectedVolumeData;
+        public VolumeData SelectedVolumeData
+        {
+            get { return _selectedVolumeData; }
+            set
+            {
+                if (_selectedVolumeData != value)
+                {
+                    _selectedVolumeData = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private Boolean _isLoaded;
         public Boolean IsLoaded
         {
             get { return _isLoaded; }
@@ -47,59 +108,18 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             }
         }
 
-        public BookData SelectedBook
-        {
-            get { return _selectedBook; }
-            set
-            {
-                if (_selectedBook != value)
-                {
-                    _selectedBook = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public AuthorData SelectedAuthor
-        {
-            get { return _selectedAuthor; }
-            set
-            {
-                if (_selectedAuthor != value)
-                {
-                    _selectedAuthor = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public VolumeData SelectedVolume
-        {
-            get { return _selectedVolume; }
-            set
-            {
-                if (_selectedVolume != value)
-                {
-                    _selectedVolume = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
         public DelegateCommand CreateBookCommand { get; private set; }
         public DelegateCommand UpdateBookCommand { get; private set; }
         public DelegateCommand DeleteBookCommand { get; private set; }
 
         public event EventHandler<BookData> BookEditingStarted;
 
-        public DelegateCommand AddAuthorCommand { get; private set; }
+        public DelegateCommand CreateAuthorCommand { get; private set; }
         public DelegateCommand UpdateAuthorCommand { get; private set; }
+        public DelegateCommand AddAuthorCommand { get; private set; }
         public DelegateCommand RemoveAuthorCommand { get; private set; }
 
         public event EventHandler<AuthorEditingEventArgs> AuthorEditingStarted;
-
-        public DelegateCommand AddCoverCommand { get; private set; }
-        public DelegateCommand DeleteCoverCommand { get; private set; }
-
-        public event EventHandler<CoverEditingEventArgs> CoverEditingStarted;
 
         public DelegateCommand AddVolumeCommand { get; private set; }
         public DelegateCommand UpdateVolumeCommand { get; private set; }
@@ -119,19 +139,18 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         {
             _model = model ?? throw new ArgumentNullException(nameof(model));
 
-            _model.BookChanged += Model_BookChanged;
+            _model.BookDatasChanged += Model_BookChanged;
             _isLoaded = false;
 
             CreateBookCommand = new DelegateCommand(param => CreateBook());
             UpdateBookCommand = new DelegateCommand(param => UpdateBook(param as BookData));
             DeleteBookCommand = new DelegateCommand(param => DeleteBook(param as BookData));
 
-            AddAuthorCommand = new DelegateCommand(param => AddAuthor());
-            UpdateAuthorCommand = new DelegateCommand(param => UpdateAuthor(param as AuthorData));
-            RemoveAuthorCommand = new DelegateCommand(param => RemoveAuthor(param as AuthorData));
 
-            AddCoverCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
-            DeleteCoverCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
+            CreateAuthorCommand = new DelegateCommand(param => CreateAuthor());
+            UpdateAuthorCommand = new DelegateCommand(param => UpdateAuthor(param as AuthorData));
+            AddAuthorCommand = new DelegateCommand(param => AddAuthor());
+            RemoveAuthorCommand = new DelegateCommand(param => RemoveAuthor(param as AuthorData));
 
             AddVolumeCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
             UpdateVolumeCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
@@ -149,8 +168,9 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         }
         private void UpdateBook(BookData bookData)
         {
-            if (bookData == null || Books.Contains(bookData) == false)
+            if (bookData == null || BookDatas.Contains(bookData) == false)
             {
+                OnMessageApplication(String.Format("Failed to DELETE book.{0}Info: Local sync problem.", Environment.NewLine));
                 return;
             }
 
@@ -159,11 +179,11 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         private void DeleteBook(BookData bookData)
         {
             if (bookData == null
-             || Books.Contains(bookData) == false
+             || BookDatas.Contains(bookData) == false
              || bookData.AuthorDatas.Any()
-             || bookData.Cover != null
              || bookData.VolumeDatas.Any())
             {
+                OnMessageApplication(String.Format("Failed to DELETE book.{0}Info: Local sync problem or still active links to other datas.", Environment.NewLine));
                 return;
             }
 
@@ -171,7 +191,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             {
                 _model.DeleteBook(bookData);
 
-                Books.Remove(bookData);
+                BookDatas.Remove(bookData);
             }
             catch (Exception exception)
             {
@@ -185,53 +205,72 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         }
         private void Model_BookChanged(Object sender, Int32 e)
         {
-            Int32 index = Books.IndexOf(Books.FirstOrDefault(b => b.Id == e));
+            Int32 index = BookDatas.IndexOf(BookDatas.FirstOrDefault(b => b.Id == e));
 
             if (index != -1)
             {
-                Books.RemoveAt(index);
+                BookDatas.RemoveAt(index);
             }
             else
             {
                 index = e - 1;
             }
 
-            Books.Insert(index, _model.Books[index]);
+            BookDatas.Insert(index, _model.BookDatas[index]);
 
-            SelectedBook = Books[index];
+            SelectedBookData = BookDatas[index];
         }
 
-        private void AddAuthor()
+        private void CreateAuthor()
         {
-            if (SelectedBook == null || Books.Contains(SelectedBook) == false)
+            if (SelectedBookData == null || BookDatas.Contains(SelectedBookData) == false)
             {
                 return;
             }
 
-            OnAuthorEditingStarted(new AuthorData(), SelectedBook.Id);
+            OnAuthorEditingStarted(new AuthorData(), SelectedBookData.Id);
         }
         private void UpdateAuthor(AuthorData authorData)
         {
-            if (SelectedBook == null
-             || Books.Contains(SelectedBook) == false
+            if (SelectedBookData == null
+             || BookDatas.Contains(SelectedBookData) == false
              || authorData == null
-             || Books.First(b => b.Equals(SelectedBook.Id)).AuthorDatas.Contains(authorData) == false)
+             || BookDatas.First(b => b.Equals(SelectedBookData)).AuthorDatas.Contains(authorData) == false)
             {
                 return;
             }
 
-            OnAuthorEditingStarted(authorData, SelectedBook.Id);
+            OnAuthorEditingStarted(authorData, SelectedBookData.Id);
+        }
+        private void AddAuthor()
+        {
+            if (SelectedBookData == null || BookDatas.Contains(SelectedBookData) == false
+             || SelectedAddingAuthorData == null || AuthorDatas.Contains(SelectedAddingAuthorData) == false
+             || SelectedBookData.AuthorDatas.Contains(SelectedAddingAuthorData))
+            {
+                return;
+            }
+
+            try
+            {
+                _model.AddAuthor(SelectedAddingAuthorData.Id, SelectedBookData.Id);
+            }
+            catch (Exception exception)
+            {
+                OnMessageApplication(String.Format("Failed to ADD author.{0}Info: {1}", Environment.NewLine, exception.Message));
+            }
+            
         }
         private void RemoveAuthor(AuthorData authorData)
         {
-            if (SelectedBook == null
-             || Books.Contains(SelectedBook) == false
+            if (SelectedBookData == null
+             || BookDatas.Contains(SelectedBookData) == false
              || authorData == null)
             {
                 return;
             }
 
-            BookData book = Books.First(b => b.Equals(SelectedBook.Id));
+            BookData book = BookDatas.First(b => b.Equals(SelectedBookData));
 
             if (book.AuthorDatas.Contains(authorData) == false)
             {
@@ -240,7 +279,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 
             try
             {
-                _model.RemoveAuthor(authorData, book.Id);
+                _model.RemoveAuthor(authorData.Id, book.Id);
             }
             catch (Exception exception)
             {
@@ -259,7 +298,8 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             {
                 await _model.LoadAsync();
 
-                Books = new ObservableCollection<BookData>(_model.Books);
+                BookDatas = new ObservableCollection<BookData>(_model.BookDatas);
+                AuthorDatas = new ObservableCollection<AuthorData>(_model.AuthorDatas);
 
                 IsLoaded = true;
             }

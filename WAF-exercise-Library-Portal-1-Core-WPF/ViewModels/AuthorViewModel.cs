@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 using WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects;
 using WAF_exercise_Library_Portal_1_Core_WPF.Models;
 
@@ -25,16 +22,18 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         {
             _model = model ?? throw new ArgumentNullException(nameof(model));
             EditedAuthor = authorData;
+            OnPropertyChanged("EditedAuthor");
             _bookId = bookId;
 
             SaveCommand = new DelegateCommand((param) => Save());
             CancelCommand = new DelegateCommand((param) => Cancel());
         }
+
         private void Save()
         {
             if (String.IsNullOrEmpty(EditedAuthor.Name))
             {
-                OnMessageApplication(String.Format("Failed to CREATE book.{0}Info: Invalid NAME.", Environment.NewLine));
+                OnAuthorEditingFinished();
                 return;
             }
 
@@ -42,7 +41,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             {
                 try
                 {
-                    _model.AddAuthor(EditedAuthor, _bookId);
+                    _model.CreateAuthor(EditedAuthor, _bookId);
                 }
                 catch (Exception exception)
                 {
@@ -54,7 +53,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             {
                 try
                 {
-                    _model.UpdateAuthor(EditedAuthor, _bookId);
+                    _model.UpdateAuthor(EditedAuthor);
                 }
                 catch (Exception exception)
                 {

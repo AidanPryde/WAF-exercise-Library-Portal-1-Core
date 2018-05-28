@@ -107,7 +107,7 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
         {
             try
             {
-                Book book = _context.Book.FirstOrDefault(b => b.Equals(bookData.Id));
+                Book book = _context.Book.FirstOrDefault(b => b.Equals(bookData));
 
                 if (book == null)
                 {
@@ -136,7 +136,7 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
         {
             try
             {
-                Book book = _context.Book.FirstOrDefault(b => b.Equals(id));
+                Book book = _context.Book.FirstOrDefault(b => b.Id == id);
 
                 if (book == null)
                 {

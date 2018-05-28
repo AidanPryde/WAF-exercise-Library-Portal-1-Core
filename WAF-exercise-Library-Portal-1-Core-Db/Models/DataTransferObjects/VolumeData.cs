@@ -6,6 +6,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
     public class VolumeData
     {
         public String Id { get; set; }
+        public Boolean IsSortedOut { get; set; }
         public BookData BookData { get; set; }
 
         public ICollection<LendingData> Lendings { get; set; }
@@ -15,15 +16,19 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
 
         }
 
-        public VolumeData(String id, BookData bookData)
-        {
-            Id = id;
-            BookData = bookData;
-        }
-
         public VolumeData(String id)
         {
             Id = id;
+        }
+
+        public VolumeData(String id, Boolean isSortedOut) : this(id)
+        {
+            IsSortedOut = isSortedOut;
+        }
+
+        public VolumeData(String id, Boolean isSortedOut, BookData bookData) : this(id, isSortedOut)
+        {
+            BookData = bookData;
         }
 
         public override Boolean Equals(Object obj)

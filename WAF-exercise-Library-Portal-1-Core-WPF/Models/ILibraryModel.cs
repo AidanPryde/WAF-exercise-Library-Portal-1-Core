@@ -13,37 +13,38 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
         Task<Boolean> LoginAsync(String name, String password);
         Task<Boolean> LogoutAsync();
 
-        IReadOnlyList<BookData> Books { get; }
+        IReadOnlyList<BookData> BookDatas { get; }
         void CreateBook(BookData bookData);
         void UpdateBook(BookData bookData);
         void DeleteBook(BookData bookData);
-        event EventHandler<Int32> BookChanged;
+        event EventHandler<Int32> BookDatasChanged;
 
-        IReadOnlyList<BookAuthorData> BookAuthors { get; }
-        void AddBookAuthor(BookAuthorData bookAuthorData);
-        void RemoveBookAuthor(BookAuthorData bookAuthorData);
-        event EventHandler<Int32> BookAuthorChanged;
+        IReadOnlyList<BookAuthorData> BookAuthorDatas { get; }
+        void CreateBookAuthor(BookAuthorData bookAuthorData);
+        void DeleteBookAuthor(Int32 bookAuthorId);
+        event EventHandler<Int32> BookAuthorDatasChanged;
 
-        IReadOnlyList<AuthorData> Authors { get; }
-        void AddAuthor(AuthorData authorData, Int32 bookId);
-        void UpdateAuthor(AuthorData authorData, Int32 bookId);
-        void RemoveAuthor(AuthorData authorData, Int32 bookId);
-        event EventHandler<Int32> AuthorChanged;
+        IReadOnlyList<AuthorData> AuthorDatas { get; }
+        void AddAuthor(Int32 authorId, Int32 bookId);
+        void CreateAuthor(AuthorData authorData, Int32 bookId);
+        void UpdateAuthor(AuthorData authorData);
+        void RemoveAuthor(Int32 authorId, Int32 bookId);
+        event EventHandler<Int32> AuthorDatasChanged;
 
-        IReadOnlyList<CoverData> Covers { get; }
-        void AddCover(CoverData authorData);
-        void RemoveCover(CoverData authorData);
-        event EventHandler<Int32> CoverChanged;
+        IReadOnlyList<CoverData> CoverDatas { get; }
+        CoverData CreateCover(Int32 bookId, Byte[] image);
+        CoverData AddCover(Int32 bookId, Int32 coverId);
+        void RemoveCover(Int32 bookId);
+        event EventHandler<Int32> CoverDatasChanged;
 
-        IReadOnlyList<VolumeData> Volumes { get; }
-        void AddVolume(VolumeData authorData);
-        void UpdateVolume(VolumeData authorData);
-        void DeleteVolume(VolumeData authorData);
-        void SortingOutVolume(VolumeData authorData);
-        event EventHandler<Int32> VolumeChanged;
+        IReadOnlyList<VolumeData> VolumeDatas { get; }
+        void CreateVolume(VolumeData volumeData, Int32 bookId);
+        void UpdateVolume(VolumeData volumeData);
+        void DeleteVolume(String volumeDataId);
+        event EventHandler<String> VolumeDatasChanged;
 
-        IReadOnlyList<LendingData> Lendings { get; }
-        event EventHandler<Int32> LendingChanged;
+        IReadOnlyList<LendingData> LendingDatas { get; }
+        event EventHandler<Int32> LendingDatasChanged;
 
         Task LoadAsync();
         Task SaveAsync();

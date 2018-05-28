@@ -30,8 +30,9 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                 return Ok(_context
                         .Volume
                         .ToList()
-                        .Select(v => new VolumeData(v.Id
-                            , new BookData(v.BookId))));
+                        .Select(v => new VolumeData(v.Id,
+                            v.IsSordtedOut,
+                            new BookData(v.BookId))));
             }
             catch
             {
@@ -76,6 +77,7 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                         .Where(v => v.BookId == id)
                         .ToList()
                         .Select(v => new VolumeData(v.Id,
+                            v.IsSordtedOut,
                             new BookData(v.BookId)
                         )));
             }

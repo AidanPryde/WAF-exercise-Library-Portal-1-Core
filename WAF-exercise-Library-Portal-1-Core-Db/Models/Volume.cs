@@ -16,6 +16,8 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models
         [Key]
         public String Id { get; set; }
 
+        public Boolean IsSordtedOut { get; set; }
+
         [Required]
         [DisplayName("Book")]
         public Int32 BookId { get; set; }

@@ -12,7 +12,6 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
 
         public AuthorData()
         {
-            Id = -1;
         }
 
         public AuthorData(Int32 id)

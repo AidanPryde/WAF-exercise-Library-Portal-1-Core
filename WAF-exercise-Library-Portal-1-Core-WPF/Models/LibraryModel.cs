@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using WAF_exercise_Library_Portal_1_Core_Db.Models;
 using WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects;
 using WAF_exercise_Library_Portal_1_Core_WPF.Persistence;
 
@@ -22,34 +23,34 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
         private ILibraryPersistence _persistence;
 
         private List<BookData> _bookDatas;
-        public IReadOnlyList<BookData> Books { get { return _bookDatas; } }
-        private Dictionary<BookData, DataStateFlag> _booksFlags;
-        public event EventHandler<Int32> BookChanged;
+        public IReadOnlyList<BookData> BookDatas { get { return _bookDatas; } }
+        private Dictionary<BookData, DataStateFlag> _bookDatasFlags;
+        public event EventHandler<Int32> BookDatasChanged;
 
         private List<BookAuthorData> _bookAuthorDatas;
-        public IReadOnlyList<BookAuthorData> BookAuthors { get { return _bookAuthorDatas; } }
-        private Dictionary<BookAuthorData, DataStateFlag> _bookAuthorsFlags;
-        public event EventHandler<Int32> BookAuthorChanged;
+        public IReadOnlyList<BookAuthorData> BookAuthorDatas { get { return _bookAuthorDatas; } }
+        private Dictionary<BookAuthorData, DataStateFlag> _bookAuthorsDatasFlags;
+        public event EventHandler<Int32> BookAuthorDatasChanged;
 
         private List<AuthorData> _authorDatas;
-        public IReadOnlyList<AuthorData> Authors { get { return _authorDatas; } }
-        private Dictionary<AuthorData, DataStateFlag> _authorsFlags;
-        public event EventHandler<Int32> AuthorChanged;
+        public IReadOnlyList<AuthorData> AuthorDatas { get { return _authorDatas; } }
+        private Dictionary<AuthorData, DataStateFlag> _authorsDatasFlags;
+        public event EventHandler<Int32> AuthorDatasChanged;
 
         private List<CoverData> _coverDatas;
-        public IReadOnlyList<CoverData> Covers { get { return _coverDatas; } }
-        private Dictionary<CoverData, DataStateFlag> _coversFlags;
-        public event EventHandler<Int32> CoverChanged;
+        public IReadOnlyList<CoverData> CoverDatas { get { return _coverDatas; } }
+        private Dictionary<CoverData, DataStateFlag> _coversDatasFlags;
+        public event EventHandler<Int32> CoverDatasChanged;
 
         private List<VolumeData> _volumeDatas;
-        public IReadOnlyList<VolumeData> Volumes { get { return _volumeDatas; } }
-        private Dictionary<VolumeData, DataStateFlag> _volumesFlags;
-        public event EventHandler<Int32> VolumeChanged;
+        public IReadOnlyList<VolumeData> VolumeDatas { get { return _volumeDatas; } }
+        private Dictionary<VolumeData, DataStateFlag> _volumesDatasFlags;
+        public event EventHandler<String> VolumeDatasChanged;
 
         private List<LendingData> _lendingDatas;
-        public IReadOnlyList<LendingData> Lendings { get { return _lendingDatas; } }
-        private Dictionary<LendingData, DataStateFlag> _lendingsFlags;
-        public event EventHandler<Int32> LendingChanged;
+        public IReadOnlyList<LendingData> LendingDatas { get { return _lendingDatas; } }
+        private Dictionary<LendingData, DataStateFlag> _lendingsDatasFlags;
+        public event EventHandler<Int32> LendingDatasChanged;
 
         public Boolean IsUserLoggedIn { get; private set; }
 
@@ -97,9 +98,9 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             return IsUserLoggedIn;
         }
 
-        private void OnBookChanged(Int32 bookId)
+        private void OnBookDatasChanged(Int32 bookId)
         {
-            BookChanged?.Invoke(this, bookId);
+            BookDatasChanged?.Invoke(this, bookId);
         }
         public void CreateBook(BookData bookData)
         {
@@ -114,10 +115,11 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             }
 
             bookData.Id = (_bookDatas.Count > 0 ? _bookDatas.Max(b => b.Id) : 0) + 1;
-            _booksFlags.Add(bookData, DataStateFlag.Created);
+            
             _bookDatas.Add(bookData);
+            _bookDatasFlags.Add(bookData, DataStateFlag.Created);
 
-            OnBookChanged(bookData.Id);
+            OnBookDatasChanged(bookData.Id);
         }
         public void UpdateBook(BookData bookData)
         {
@@ -126,20 +128,20 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
                 throw new ArgumentNullException(nameof(bookData));
             }
 
-            BookData bookToModify = _bookDatas.FirstOrDefault(b => b.Equals(bookData.Id))
+            BookData oldBookData = _bookDatas.FirstOrDefault(b => b.Equals(bookData))
                 ?? throw new ArgumentException("The book does not exist.", nameof(bookData));
 
-            bookToModify.Title = bookData.Title;
-            bookToModify.PublishedYear = bookData.PublishedYear;
-            bookToModify.Isbn = bookData.Isbn;
+            oldBookData.Title = bookData.Title;
+            oldBookData.PublishedYear = bookData.PublishedYear;
+            oldBookData.Isbn = bookData.Isbn;
 
-            if (_booksFlags.ContainsKey(bookToModify) == false
-             || _booksFlags[bookToModify] == DataStateFlag.Deleted)
+            if (_bookDatasFlags.ContainsKey(oldBookData) == false
+             || _bookDatasFlags[oldBookData] == DataStateFlag.Deleted)
             {
-                _booksFlags[bookToModify] = DataStateFlag.Updated;
+                _bookDatasFlags[oldBookData] = DataStateFlag.Updated;
             }
 
-            OnBookChanged(bookData.Id);
+            OnBookDatasChanged(bookData.Id);
         }
         public void DeleteBook(BookData bookData)
         {
@@ -148,196 +150,375 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
                 throw new ArgumentNullException(nameof(bookData));
             }
 
-            BookData bookToDelete = _bookDatas.FirstOrDefault(b => b.Equals(bookData.Id))
-                ?? throw new ArgumentException("The building does not exist.", nameof(bookData));
+            BookData bookToDelete = _bookDatas.FirstOrDefault(b => b.Equals(bookData))
+                ?? throw new ArgumentException("The book does not exist.", nameof(bookData));
 
-            if (_booksFlags.ContainsKey(bookToDelete)
-             && _booksFlags[bookToDelete] == DataStateFlag.Created)
+            if (bookToDelete.Cover != null
+             || bookToDelete.AuthorDatas.Any()
+             || bookToDelete.VolumeDatas.Any())
             {
-                _booksFlags.Remove(bookToDelete);
-            }
-            else
-            {
-                _booksFlags[bookToDelete] = DataStateFlag.Deleted;
+                throw new ArgumentException("The book still has links to other datas.", nameof(bookData));
             }
 
             _bookDatas.Remove(bookToDelete);
+
+            if (_bookDatasFlags.ContainsKey(bookToDelete)
+             && _bookDatasFlags[bookToDelete] == DataStateFlag.Created)
+            {
+                _bookDatasFlags.Remove(bookToDelete);
+            }
+            else
+            {
+                _bookDatasFlags[bookToDelete] = DataStateFlag.Deleted;
+            }
         }
 
-        private void OnBookAuthorChanged(Int32 bookAuthorId)
+        private void OnBookAuthorDatasChanged(Int32 bookAuthorId)
         {
-            BookAuthorChanged?.Invoke(this, bookAuthorId);
+            BookAuthorDatasChanged?.Invoke(this, bookAuthorId);
         }
-        public void AddBookAuthor(BookAuthorData bookAuthorData)
+        public void CreateBookAuthor(BookAuthorData bookAuthorData)
         {
-            throw new NotImplementedException();
+            if (bookAuthorData == null)
+            {
+                throw new ArgumentNullException(nameof(bookAuthorData));
+            }
+
+            if (_bookAuthorDatas.Contains(bookAuthorData))
+            {
+                throw new ArgumentException("BookAuthor already in the collection.", nameof(bookAuthorData));
+            }
+
+            if (bookAuthorData.AuthorData == null
+             || _authorDatas.Contains(bookAuthorData.AuthorData) == false
+             || bookAuthorData.BookData == null
+             || _bookDatas.Contains(bookAuthorData.BookData) == false)
+            {
+                throw new ArgumentException("BookAuthor try to link to invalid data.", nameof(bookAuthorData));
+            }
+
+            _bookAuthorDatas.Add(bookAuthorData);
+            _bookAuthorsDatasFlags[bookAuthorData] = DataStateFlag.Created;
+            OnBookAuthorDatasChanged(bookAuthorData.Id);
+
+            bookAuthorData.AuthorData.BookDatas.Add(bookAuthorData.BookData);
+            OnAuthorDatasChanged(bookAuthorData.AuthorData.Id);
+
+            bookAuthorData.BookData.AuthorDatas.Add(bookAuthorData.AuthorData);
+            OnBookDatasChanged(bookAuthorData.BookData.Id);
         }
-        public void RemoveBookAuthor(BookAuthorData bookAuthorData)
+        public void DeleteBookAuthor(Int32 bookAuthorId)
         {
-            throw new NotImplementedException();
+            BookAuthorData bookAuthorData = _bookAuthorDatas.FirstOrDefault(bad => bad.Id == bookAuthorId)
+                ?? throw new ArgumentException("BookAuthor not in the collection.", nameof(bookAuthorId));
+
+            if (_authorDatas.Contains(bookAuthorData.AuthorData) == false
+             || _bookDatas.Contains(bookAuthorData.BookData) == false)
+            {
+                throw new ArgumentException("BookAuthor holds invalid data.", nameof(bookAuthorId));
+            }
+
+            bookAuthorData.AuthorData.BookDatas.Remove(bookAuthorData.BookData);
+            OnAuthorDatasChanged(bookAuthorData.AuthorData.Id);
+
+            bookAuthorData.BookData.AuthorDatas.Remove(bookAuthorData.AuthorData);
+            OnBookDatasChanged(bookAuthorData.BookData.Id);
+
+            _bookAuthorDatas.Remove(bookAuthorData);
+            if (_bookAuthorsDatasFlags.ContainsKey(bookAuthorData)
+             && _bookAuthorsDatasFlags[bookAuthorData] == DataStateFlag.Created)
+            {
+                _bookAuthorsDatasFlags.Remove(bookAuthorData);
+            }
+            else
+            {
+                _bookAuthorsDatasFlags[bookAuthorData] = DataStateFlag.Deleted;
+            }
+            OnBookAuthorDatasChanged(bookAuthorData.Id);
         }
 
-        private void OnAuthorChanged(Int32 authorId)
+        private void OnAuthorDatasChanged(Int32 authorId)
         {
-            AuthorChanged?.Invoke(this, authorId);
+            AuthorDatasChanged?.Invoke(this, authorId);
         }
-        public void AddAuthor(AuthorData authorData, Int32 bookId)
+        public void CreateAuthor(AuthorData authorData, Int32 bookId)
         {
             if (authorData == null)
             {
                 throw new ArgumentNullException(nameof(authorData));
             }
 
-            BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId);
-            if (bookData == null)
-            {
-                throw new ArgumentException("No book in the collection.", nameof(bookId));
-            }
+            BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId)
+                ?? throw new ArgumentException("No book in the collection.", nameof(bookId));
 
-            if (Authors.Contains(authorData))
+            if (AuthorDatas.Contains(authorData))
             {
                 throw new ArgumentException("Author already in the author collection.", nameof(bookId));
             }
 
             authorData.Id = (_authorDatas.Count > 0 ? _authorDatas.Max(b => b.Id) : 0) + 1;
             _authorDatas.Add(authorData);
-            _authorsFlags.Add(authorData, DataStateFlag.Created);
-            OnAuthorChanged(authorData.Id);
+            _authorsDatasFlags.Add(authorData, DataStateFlag.Created);
 
-            //bookData.BookAuthors.Add(authorData);
-            if (_booksFlags.ContainsKey(bookData) == false
-             || _booksFlags[bookData] == DataStateFlag.Deleted)
-            {
-                _booksFlags[bookData] = DataStateFlag.Updated;
-            }
-            OnBookChanged(bookData.Id);
+            CreateBookAuthor(new BookAuthorData((_bookAuthorDatas.Count > 0 ? _bookAuthorDatas.Max(bad => bad.Id) : 0) + 1,
+                bookData,
+                authorData));
+
         }
-        public void UpdateAuthor(AuthorData authorData, Int32 bookId)
+        public void AddAuthor(Int32 authorId, Int32 bookId)
+        {
+            AuthorData authorData = _authorDatas.FirstOrDefault(b => b.Id == authorId)
+                ?? throw new ArgumentException("The author does not exist.", nameof(authorId));
+
+            BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId)
+                ?? throw new ArgumentException("No book in the collection.", nameof(bookId));
+
+            if (authorData.BookDatas.Contains(bookData))
+            {
+                throw new Exception("Book already in the book collection of the author.");
+            }
+
+            if (bookData.AuthorDatas.Contains(authorData))
+            {
+                throw new Exception("Author already in the author collection of the book.");
+            }
+
+            if (_bookAuthorDatas.FirstOrDefault(bad => bad.AuthorData.Id == authorId && bad.BookData.Id == bookId) != null)
+            {
+                throw new Exception("BookAuthor already in the collection.");
+            }
+
+            CreateBookAuthor(new BookAuthorData((_bookAuthorDatas.Count > 0 ? _bookAuthorDatas.Max(b => b.Id) : 0) + 1,
+                bookData,
+                authorData));
+        }
+        public void UpdateAuthor(AuthorData authorData)
         {
             if (authorData == null)
             {
                 throw new ArgumentNullException(nameof(authorData));
             }
 
-            BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId);
-            if (bookData == null)
-            {
-                throw new ArgumentException("No book in the collection.", nameof(bookId));
-            }
-
-            /*if (bookData.BookAuthors.Contains(authorData) == false)
-            {
-                throw new ArgumentException("No author in the author collection of the book.", nameof(bookId));
-            }*/
-
-            AuthorData authorToModify = _authorDatas.FirstOrDefault(b => b.Equals(authorData))
+            AuthorData oldAuthorData = _authorDatas.FirstOrDefault(b => b.Equals(authorData))
                 ?? throw new ArgumentException("The author does not exist.", nameof(authorData));
 
-            authorToModify.Name = authorData.Name;
+            oldAuthorData.Name = authorData.Name;
 
-            if (_authorsFlags.ContainsKey(authorToModify) == false
-             || _authorsFlags[authorToModify] == DataStateFlag.Deleted)
+            if (_authorsDatasFlags.ContainsKey(oldAuthorData) == false
+             || _authorsDatasFlags[oldAuthorData] == DataStateFlag.Deleted)
             {
-                _authorsFlags[authorToModify] = DataStateFlag.Updated;
+                _authorsDatasFlags[oldAuthorData] = DataStateFlag.Updated;
             }
-            OnAuthorChanged(authorData.Id);
+            OnAuthorDatasChanged(oldAuthorData.Id);
 
-            //bookData.BookAuthors.First(bd => bd.Equals(authorData)).Name = authorData.Name;
-            if (_booksFlags.ContainsKey(bookData) == false
-             || _booksFlags[bookData] == DataStateFlag.Deleted)
+            foreach (BookData bookData in oldAuthorData.BookDatas)
             {
-                _booksFlags[bookData] = DataStateFlag.Updated;
+                if (_bookDatas.Contains(bookData) == false)
+                {
+                    throw new Exception("Book is not in the collection.");
+                }
+                OnBookDatasChanged(bookData.Id);
             }
-            OnBookChanged(bookData.Id);
         }
-        public void RemoveAuthor(AuthorData authorData, Int32 bookId)
+        public void RemoveAuthor(Int32 authorId, Int32 bookId)
         {
-            if (authorData == null)
+            AuthorData authorData = _authorDatas.FirstOrDefault(b => b.Id == authorId)
+                ?? throw new ArgumentException("The author does not exist.", nameof(authorId));
+
+            BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId)
+                ?? throw new ArgumentException("No book in the collection.", nameof(bookId));
+
+            if (authorData.BookDatas.Contains(bookData) == false)
             {
-                throw new ArgumentNullException(nameof(authorData));
+                throw new Exception("Book not in the book collection of the author.");
             }
 
-            BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId);
-            if (bookData == null)
+            if (bookData.AuthorDatas.Contains(authorData) == false)
             {
-                throw new ArgumentException("No book in the collection.", nameof(bookId));
+                throw new Exception("Author not in the author collection of the book.");
             }
 
-            /*if (bookData.BookAuthors.Contains(authorData) == false)
-            {
-                throw new ArgumentException("No author in the author collection of the book.", nameof(bookId));
-            }*/
+            BookAuthorData bookAuthorData = _bookAuthorDatas.FirstOrDefault(bad => bad.AuthorData.Id == authorId && bad.BookData.Id == bookId)
+                ?? throw new Exception("BookAuthor not in the collection.");
 
-            AuthorData authorToRemove = _authorDatas.FirstOrDefault(b => b.Equals(authorData))
-                ?? throw new ArgumentException("The author does not exist.", nameof(authorData));
+            DeleteBookAuthor(bookAuthorData.Id);
+        }
 
-            //bookData.BookAuthors.Remove(authorData);
-            if (_booksFlags.ContainsKey(bookData) == false
-             || _booksFlags[bookData] == DataStateFlag.Deleted)
+        private void OnCoverDatasChanged(Int32 coverId)
+        {
+            CoverDatasChanged?.Invoke(this, coverId);
+        }
+        public CoverData CreateCover(Int32 bookId, Byte[] image)
+        {
+            BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId)
+                ?? throw new Exception(String.Format("No book found with id: {0}", bookId));
+
+            Int32 coverId = (_coverDatas.Count > 0 ? _bookDatas.Max(b => b.Id) : 0) +1;
+            _coverDatas.Add(new CoverData(coverId, image));
+
+            bookData.Cover = _coverDatas.FirstOrDefault(c => c.Id == coverId)
+                ?? throw new Exception(String.Format("No cover found with id: {0}", coverId));
+
+            if (_bookDatasFlags.ContainsKey(bookData) == false
+             || _bookDatasFlags[bookData] == DataStateFlag.Deleted)
             {
-                _booksFlags[bookData] = DataStateFlag.Updated;
+                _bookDatasFlags[bookData] = DataStateFlag.Updated;
             }
-            OnBookChanged(bookData.Id);
+
+            _coversDatasFlags[bookData.Cover] = DataStateFlag.Created;
+
+            return bookData.Cover;
+        }
+        public CoverData AddCover(Int32 bookId, Int32 coverId)
+        {
+            BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId)
+                ?? throw new Exception(String.Format("No book found with id: {0}", bookId));
+
+            CoverData coverData = _coverDatas.FirstOrDefault(c => c.Id == coverId)
+                ?? throw new Exception(String.Format("No cover found with id: {0}", coverId));
+
+            bookData.Cover = coverData;
+
+            if (_bookDatasFlags.ContainsKey(bookData) == false
+             || _bookDatasFlags[bookData] == DataStateFlag.Deleted)
+            {
+                _bookDatasFlags[bookData] = DataStateFlag.Updated;
+            }
+
+            return coverData;
+        }
+        public void RemoveCover(Int32 bookId)
+        {
+            BookData bookData = _bookDatas.FirstOrDefault(b => bookId == b.Id)
+                ?? throw new Exception(String.Format("No book found with id: {0}", bookId));
+
+            if (bookData.Cover == null)
+            {
+                throw new Exception(String.Format("Book has no cover: {0}", bookId));
+            }
+
+            bookData.Cover = null;
+
+            if (_bookDatasFlags.ContainsKey(bookData) == false
+             || _bookDatasFlags[bookData] == DataStateFlag.Deleted)
+            {
+                _bookDatasFlags[bookData] = DataStateFlag.Updated;
+            }
         }
 
-        private void OnCoverChanged(Int32 coverId)
+        private void OnVolumeDatasChanged(String volumeDataId)
         {
-            CoverChanged?.Invoke(this, coverId);
+            VolumeDatasChanged?.Invoke(this, volumeDataId);
         }
-        public void AddCover(CoverData authorData)
+        public void CreateVolume(VolumeData volumeData, Int32 bookId)
         {
-            throw new NotImplementedException();
+            if (volumeData == null)
+            {
+                throw new ArgumentNullException(nameof(volumeData));
+            }
+
+            if (_volumeDatas.Contains(volumeData))
+            {
+                throw new ArgumentException("The volume is already in the collection.", nameof(volumeData));
+            }
+
+            BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId)
+                ?? throw new Exception(String.Format("No book found with id: {0}", bookId));
+
+            volumeData.Id = Guid.NewGuid().ToString();
+            volumeData.BookData = bookData;
+
+            _volumesDatasFlags.Add(volumeData, DataStateFlag.Created);
+            _volumeDatas.Add(volumeData);
+
+            OnVolumeDatasChanged(volumeData.Id);
+            OnBookDatasChanged(bookData.Id);
         }
-        public void RemoveCover(CoverData authorData)
+        public void UpdateVolume(VolumeData volumeData)
         {
-            throw new NotImplementedException();
+            VolumeData oldVolumeData = _volumeDatas.FirstOrDefault(v => v.Equals(volumeData))
+                ?? throw new Exception(String.Format("No book found with id: {0}", volumeData));
+
+            if (oldVolumeData.BookData == null)
+            {
+                throw new Exception(String.Format("Invalid volume without book: {0}", volumeData));
+            }
+
+            BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == oldVolumeData.BookData.Id)
+                ?? throw new Exception(String.Format("No book found with id: {0}", oldVolumeData));
+
+            if (volumeData.IsSortedOut == true)
+            {
+                foreach (LendingData lendingData in volumeData.Lendings)
+                {
+                    if (IsStopingSortingOutLending(lendingData))
+                    {
+                        throw new Exception(String.Format("Volume can not be sorted out: {0}", oldVolumeData));
+                    }
+                }
+            }
+            oldVolumeData.IsSortedOut = volumeData.IsSortedOut;
+
+            if (_volumesDatasFlags.ContainsKey(oldVolumeData) == false
+             || _volumesDatasFlags[oldVolumeData] == DataStateFlag.Deleted)
+            {
+                _volumesDatasFlags[oldVolumeData] = DataStateFlag.Updated;
+            }
+            OnVolumeDatasChanged(oldVolumeData.Id);
+
+            OnBookDatasChanged(bookData.Id);
+
+        }
+        public void DeleteVolume(String volumeDataId)
+        {
+            VolumeData volumeData = _volumeDatas.FirstOrDefault(v => v.Id == volumeDataId)
+                ?? throw new ArgumentException("Volume is not in the collection.", nameof(volumeDataId));
+
+            if (_bookDatas.Contains(volumeData.BookData) == false)
+            {
+                throw new ArgumentException("Volume holds invalid data.", nameof(volumeDataId));
+            }
+
+            volumeData.BookData.VolumeDatas.Remove(volumeData);
+            OnBookDatasChanged(volumeData.BookData.Id);
+
+            _volumeDatas.Remove(volumeData);
+            if (_volumesDatasFlags.ContainsKey(volumeData)
+             && _volumesDatasFlags[volumeData] == DataStateFlag.Created)
+            {
+                _volumesDatasFlags.Remove(volumeData);
+            }
+            else
+            {
+                _volumesDatasFlags[volumeData] = DataStateFlag.Deleted;
+            }
+            OnVolumeDatasChanged(volumeData.Id);
         }
 
-        private void OnVolumeChanged(Int32 volumeId)
+        private void OnLendingDatasChanged(Int32 lendingId)
         {
-            VolumeChanged?.Invoke(this, volumeId);
-        }
-        public void AddVolume(VolumeData authorData)
-        {
-            throw new NotImplementedException();
-        }
-        public void UpdateVolume(VolumeData authorData)
-        {
-            throw new NotImplementedException();
-        }
-        public void DeleteVolume(VolumeData authorData)
-        {
-            throw new NotImplementedException();
-        }
-        public void SortingOutVolume(VolumeData authorData)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void OnLendingChanged(Int32 lendingId)
-        {
-            LendingChanged?.Invoke(this, lendingId);
+            LendingDatasChanged?.Invoke(this, lendingId);
         }
 
         public async Task LoadAsync()
         {
             _bookDatas = (await _persistence.ReadBooksAsync()).ToList();
-            _booksFlags = new Dictionary<BookData, DataStateFlag>();
+            _bookDatasFlags = new Dictionary<BookData, DataStateFlag>();
 
             _bookAuthorDatas = (await _persistence.ReadBookAuthorsAsync()).ToList();
-            _bookAuthorsFlags = new Dictionary<BookAuthorData, DataStateFlag>();
+            _bookAuthorsDatasFlags = new Dictionary<BookAuthorData, DataStateFlag>();
 
             _authorDatas = (await _persistence.ReadAuthorsAsync()).ToList();
-            _authorsFlags = new Dictionary<AuthorData, DataStateFlag>();
+            _authorsDatasFlags = new Dictionary<AuthorData, DataStateFlag>();
 
             _coverDatas = (await _persistence.ReadCoversAsync()).ToList();
-            _coversFlags = new Dictionary<CoverData, DataStateFlag>();
+            _coversDatasFlags = new Dictionary<CoverData, DataStateFlag>();
 
             _volumeDatas = (await _persistence.ReadVolumesAsync()).ToList();
-            _volumesFlags = new Dictionary<VolumeData, DataStateFlag>();
+            _volumesDatasFlags = new Dictionary<VolumeData, DataStateFlag>();
 
             _lendingDatas = (await _persistence.ReadLendingsAsync()).ToList();
-            _lendingsFlags = new Dictionary<LendingData, DataStateFlag>();
+            _lendingsDatasFlags = new Dictionary<LendingData, DataStateFlag>();
 
             LinkingDataLists();
         }
@@ -393,13 +574,13 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
 
         private async Task SaveBooksAsync()
         {
-            List<BookData> booksToSave = _booksFlags.Keys.ToList();
+            List<BookData> booksToSave = _bookDatasFlags.Keys.ToList();
 
             foreach (BookData bookData in booksToSave)
             {
                 Boolean result = true;
 
-                switch (_booksFlags[bookData])
+                switch (_bookDatasFlags[bookData])
                 {
                     case DataStateFlag.Created:
                         result = await _persistence.CreateBookAsync(bookData);
@@ -411,26 +592,26 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
                         result = await _persistence.DeleteBookAsync(bookData);
                         break;
                     default:
-                        throw new InvalidOperationException("Operation " + _booksFlags[bookData] + " is invalid on book " + bookData.Id);
+                        throw new InvalidOperationException("Operation " + _bookDatasFlags[bookData] + " is invalid on book " + bookData.Id);
                 }
 
                 if (!result)
                 {
-                    throw new InvalidOperationException("Operation " + _booksFlags[bookData] + " failed on book " + bookData.Id);
+                    throw new InvalidOperationException("Operation " + _bookDatasFlags[bookData] + " failed on book " + bookData.Id);
                 }
 
-                _booksFlags.Remove(bookData);
+                _bookDatasFlags.Remove(bookData);
             }
         }
         private async Task SaveAuthorsAsync()
         {
-            List<AuthorData> authorsToSave = _authorsFlags.Keys.ToList();
+            List<AuthorData> authorsToSave = _authorsDatasFlags.Keys.ToList();
 
             foreach (AuthorData authorData in authorsToSave)
             {
                 Boolean result = true;
 
-                switch (_authorsFlags[authorData])
+                switch (_authorsDatasFlags[authorData])
                 {
                     case DataStateFlag.Created:
                         result = await _persistence.AddAuthorAsync(authorData);
@@ -445,13 +626,84 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
 
                 if (!result)
                 {
-                    throw new InvalidOperationException("Operation " + _authorsFlags[authorData] + " failed on author " + authorData.Id);
+                    throw new InvalidOperationException("Operation " + _authorsDatasFlags[authorData] + " failed on author " + authorData.Id);
                 }
 
-                _authorsFlags.Remove(authorData);
+                _authorsDatasFlags.Remove(authorData);
             }
         }
 
-        
+        private LendingState GetState(LendingData lendingData)
+        {
+            DateTime now = DateTime.UtcNow;
+
+            if (now < lendingData.StartDate)
+            {
+                if (lendingData.Active == 0)
+                {
+                    return LendingState.TOO_SOON_TO_PICK_UP;
+                }
+                else
+                {
+                    return LendingState.ERROR;
+                }
+            }
+
+            if (now < lendingData.EndDate)
+            {
+                if (lendingData.Active == 0)
+                {
+                    return LendingState.READY_TO_PICK_UP;
+                }
+                else if (lendingData.Active == 1)
+                {
+                    return LendingState.PICKED_UP;
+                }
+                else
+                {
+                    return LendingState.RETURNED;
+                }
+            }
+
+            if (lendingData.Active == 0)
+            {
+                return LendingState.NOT_PICKED_UP;
+            }
+            else if (lendingData.Active == 1)
+            {
+                return LendingState.NOT_RETURNED;
+            }
+            else
+            {
+                return LendingState.RETURNED;
+            }
+        }
+        private Boolean IsStopingSortingOutLending(LendingData lendingData)
+        {
+            LendingState lendingState = GetState(lendingData);
+
+            if (lendingState == LendingState.ERROR
+             || lendingState == LendingState.NOT_RETURNED
+             || lendingState == LendingState.OVERDUE_TO_RETURN
+             || lendingState == LendingState.PICKED_UP)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        private Boolean IsFinishedReturnedLending(LendingData lendingData)
+        {
+            LendingState lendingState = GetState(lendingData);
+
+            if (lendingState == LendingState.RETURNED
+             || lendingState == LendingState.PICKED_UP
+             || lendingState == LendingState.OVERDUE_TO_RETURN)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

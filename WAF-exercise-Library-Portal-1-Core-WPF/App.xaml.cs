@@ -100,6 +100,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF
         {
             _bookViewModel = new BookViewModel(_model, bookData);
             _bookViewModel.BookEditingFinished += BookViewModel_BookEditingFinished;
+            _bookViewModel.MessageApplication += ViewModel_MessageApplication;
 
             _bookView = new BookWindow
             {
@@ -110,6 +111,9 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF
         }
         private void BookViewModel_BookEditingFinished(object sender, EventArgs e)
         {
+            _bookViewModel.BookEditingFinished -= BookViewModel_BookEditingFinished;
+            _bookViewModel.MessageApplication -= ViewModel_MessageApplication;
+
             _bookView.Close();
         }
 
@@ -117,6 +121,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF
         {
             _authorViewModel = new AuthorViewModel(_model, e.AuthorData, e.BookId);
             _authorViewModel.AuthorEditingFinished += AuthorViewModel_BookEditingFinished;
+            _authorViewModel.MessageApplication += ViewModel_MessageApplication;
 
             _authorView = new AuthorWindow
             {
@@ -127,6 +132,9 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF
         }
         private void AuthorViewModel_BookEditingFinished(object sender, EventArgs e)
         {
+            _authorViewModel.AuthorEditingFinished -= AuthorViewModel_BookEditingFinished;
+            _authorViewModel.MessageApplication -= ViewModel_MessageApplication;
+
             _authorView.Close();
         }
     }
