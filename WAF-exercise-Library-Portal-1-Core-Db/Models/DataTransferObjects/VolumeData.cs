@@ -9,16 +9,20 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
         public Boolean IsSortedOut { get; set; }
         public BookData BookData { get; set; }
 
-        public ICollection<LendingData> Lendings { get; set; }
+        public ICollection<LendingData> LendingDatas { get; set; }
 
         public VolumeData()
         {
+            Id = null;
 
+            LendingDatas = new List<LendingData>();
         }
 
         public VolumeData(String id)
         {
             Id = id;
+
+            LendingDatas = new List<LendingData>();
         }
 
         public VolumeData(String id, Boolean isSortedOut) : this(id)
@@ -29,6 +33,8 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
         public VolumeData(String id, Boolean isSortedOut, BookData bookData) : this(id, isSortedOut)
         {
             BookData = bookData;
+
+            LendingDatas = new List<LendingData>();
         }
 
         public override Boolean Equals(Object obj)

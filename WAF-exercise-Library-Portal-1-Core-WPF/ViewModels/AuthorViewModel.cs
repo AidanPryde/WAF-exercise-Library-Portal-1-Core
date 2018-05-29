@@ -11,7 +11,19 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 
         private Int32 _bookId;
 
-        public AuthorData EditedAuthor { get; private set; }
+        private AuthorData _editedAuthorData;
+        public AuthorData EditedAuthorData
+        {
+            get { return _editedAuthorData; }
+            set
+            {
+                if (_editedAuthorData != value)
+                {
+                    _editedAuthorData = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public DelegateCommand SaveCommand { get; private set; }
         public DelegateCommand CancelCommand { get; private set; }
@@ -21,9 +33,9 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         public AuthorViewModel(ILibraryModel model, AuthorData authorData, Int32 bookId)
         {
             _model = model ?? throw new ArgumentNullException(nameof(model));
-            EditedAuthor = authorData;
-            OnPropertyChanged("EditedAuthor");
             _bookId = bookId;
+
+            _editedAuthorData = authorData;
 
             SaveCommand = new DelegateCommand((param) => Save());
             CancelCommand = new DelegateCommand((param) => Cancel());
@@ -31,17 +43,17 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 
         private void Save()
         {
-            if (String.IsNullOrEmpty(EditedAuthor.Name))
+            if (String.IsNullOrEmpty(EditedAuthorData.Name))
             {
                 OnAuthorEditingFinished();
                 return;
             }
 
-            if (EditedAuthor.Id == -1)
+            if (EditedAuthorData.Id == -1)
             {
                 try
                 {
-                    _model.CreateAuthor(EditedAuthor, _bookId);
+                    _model.CreateAuthor(EditedAuthorData, _bookId);
                 }
                 catch (Exception exception)
                 {
@@ -53,7 +65,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             {
                 try
                 {
-                    _model.UpdateAuthor(EditedAuthor);
+                    _model.UpdateAuthor(EditedAuthorData);
                 }
                 catch (Exception exception)
                 {

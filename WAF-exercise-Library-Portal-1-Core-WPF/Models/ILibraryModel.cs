@@ -18,33 +18,34 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
         void UpdateBook(BookData bookData);
         void DeleteBook(BookData bookData);
         event EventHandler<Int32> BookDatasChanged;
+        event EventHandler<Int32> BookDatasDeleted;
 
         IReadOnlyList<BookAuthorData> BookAuthorDatas { get; }
         void CreateBookAuthor(BookAuthorData bookAuthorData);
         void DeleteBookAuthor(Int32 bookAuthorId);
-        event EventHandler<Int32> BookAuthorDatasChanged;
 
         IReadOnlyList<AuthorData> AuthorDatas { get; }
         void AddAuthor(Int32 authorId, Int32 bookId);
         void CreateAuthor(AuthorData authorData, Int32 bookId);
         void UpdateAuthor(AuthorData authorData);
         void RemoveAuthor(Int32 authorId, Int32 bookId);
-        event EventHandler<Int32> AuthorDatasChanged;
+        event EventHandler<Int32> AuthorDataAdded;
 
         IReadOnlyList<CoverData> CoverDatas { get; }
         CoverData CreateCover(Int32 bookId, Byte[] image);
         CoverData AddCover(Int32 bookId, Int32 coverId);
         void RemoveCover(Int32 bookId);
-        event EventHandler<Int32> CoverDatasChanged;
+        event EventHandler<Int32> CoverDataAdded;
 
         IReadOnlyList<VolumeData> VolumeDatas { get; }
         void CreateVolume(VolumeData volumeData, Int32 bookId);
         void UpdateVolume(VolumeData volumeData);
         void DeleteVolume(String volumeDataId);
-        event EventHandler<String> VolumeDatasChanged;
 
         IReadOnlyList<LendingData> LendingDatas { get; }
-        event EventHandler<Int32> LendingDatasChanged;
+        void TurnLending(LendingData lendingData);
+        void DeleteLending(Int32 lendingData);
+        event EventHandler<Int32> LendingDataChanged;
 
         Task LoadAsync();
         Task SaveAsync();

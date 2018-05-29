@@ -34,7 +34,7 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                             l.ApplicationUser.Name,
                             l.StartDate,
                             l.EndDate,
-                            l.Active,
+                            l.Active == 0 ? false : true,
                             new VolumeData(l.VolumeId)
                         )));
             }

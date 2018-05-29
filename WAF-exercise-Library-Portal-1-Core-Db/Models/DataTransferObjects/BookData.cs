@@ -25,6 +25,9 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
         public BookData(Int32 id)
         {
             Id = id;
+
+            AuthorDatas = new List<AuthorData>();
+            VolumeDatas = new List<VolumeData>();
         }
 
         public BookData(Int32 id, String title, Int32 publishedYear, Int64 isbn)
@@ -33,6 +36,9 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
             Title = title;
             PublishedYear = publishedYear;
             Isbn = isbn;
+
+            AuthorDatas = new List<AuthorData>();
+            VolumeDatas = new List<VolumeData>();
         }
 
         public BookData(Int32 id, String title, Int32 publishedYear, Int64 isbn, CoverData cover)

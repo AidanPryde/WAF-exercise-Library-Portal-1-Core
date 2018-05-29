@@ -6,22 +6,22 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 {
     public static class ImageHandler
     {
-        public static Byte[] OpenAndResize(String path, Int32 width)
+        public static Byte[] OpenAndResize(String path, Int32 height)
         {
             if (path == null)
             {
                 throw new ArgumentNullException(nameof(path));
             }
 
-            if (width <= 0)
+            if (height <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(width));
+                throw new ArgumentOutOfRangeException(nameof(height));
             }
 
             BitmapImage image = new BitmapImage();
             image.BeginInit();
             image.UriSource = new Uri(path);
-            image.DecodePixelWidth = width;
+            image.DecodePixelHeight = height;
             image.EndInit();
 
             PngBitmapEncoder encoder = new PngBitmapEncoder();

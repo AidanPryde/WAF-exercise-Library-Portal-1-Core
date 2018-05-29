@@ -18,7 +18,7 @@
         </Grid.ColumnDefinitions>
         
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" Margin="5" />
-        <TextBox Grid.Row="0" Grid.Column="1" Width="150" Text="{Binding EditedAuthor.Name}" Margin="5" HorizontalAlignment="Left" />
+        <TextBox Grid.Row="0" Grid.Column="1" Width="150" Text="{Binding EditedAuthorData.Name}" Margin="5" HorizontalAlignment="Left" />
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" Grid.ColumnSpan="2" HorizontalAlignment="Right">
             <Button Content="Save" Margin="6,5,0,5" Command="{Binding SaveCommand}" Width="100" />

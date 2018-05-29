@@ -26,31 +26,31 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
         public IReadOnlyList<BookData> BookDatas { get { return _bookDatas; } }
         private Dictionary<BookData, DataStateFlag> _bookDatasFlags;
         public event EventHandler<Int32> BookDatasChanged;
+        public event EventHandler<Int32> BookDatasDeleted;
 
         private List<BookAuthorData> _bookAuthorDatas;
         public IReadOnlyList<BookAuthorData> BookAuthorDatas { get { return _bookAuthorDatas; } }
         private Dictionary<BookAuthorData, DataStateFlag> _bookAuthorsDatasFlags;
-        public event EventHandler<Int32> BookAuthorDatasChanged;
 
         private List<AuthorData> _authorDatas;
         public IReadOnlyList<AuthorData> AuthorDatas { get { return _authorDatas; } }
         private Dictionary<AuthorData, DataStateFlag> _authorsDatasFlags;
-        public event EventHandler<Int32> AuthorDatasChanged;
+        public event EventHandler<Int32> AuthorDataAdded;
 
         private List<CoverData> _coverDatas;
         public IReadOnlyList<CoverData> CoverDatas { get { return _coverDatas; } }
         private Dictionary<CoverData, DataStateFlag> _coversDatasFlags;
-        public event EventHandler<Int32> CoverDatasChanged;
+        public event EventHandler<Int32> CoverDataAdded;
 
         private List<VolumeData> _volumeDatas;
         public IReadOnlyList<VolumeData> VolumeDatas { get { return _volumeDatas; } }
         private Dictionary<VolumeData, DataStateFlag> _volumesDatasFlags;
-        public event EventHandler<String> VolumeDatasChanged;
+
 
         private List<LendingData> _lendingDatas;
         public IReadOnlyList<LendingData> LendingDatas { get { return _lendingDatas; } }
         private Dictionary<LendingData, DataStateFlag> _lendingsDatasFlags;
-        public event EventHandler<Int32> LendingDatasChanged;
+        public event EventHandler<Int32> LendingDataChanged;
 
         public Boolean IsUserLoggedIn { get; private set; }
 
@@ -101,6 +101,10 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
         private void OnBookDatasChanged(Int32 bookId)
         {
             BookDatasChanged?.Invoke(this, bookId);
+        }
+        private void OnBookDatasDeleted(Int32 bookId)
+        {
+            BookDatasDeleted?.Invoke(this, bookId);
         }
         public void CreateBook(BookData bookData)
         {
@@ -153,6 +157,12 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             BookData bookToDelete = _bookDatas.FirstOrDefault(b => b.Equals(bookData))
                 ?? throw new ArgumentException("The book does not exist.", nameof(bookData));
 
+            if (bookToDelete.AuthorDatas == null
+             || bookToDelete.VolumeDatas == null)
+            {
+                throw new Exception("Invalid book data.");
+            }
+
             if (bookToDelete.Cover != null
              || bookToDelete.AuthorDatas.Any()
              || bookToDelete.VolumeDatas.Any())
@@ -161,6 +171,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             }
 
             _bookDatas.Remove(bookToDelete);
+            OnBookDatasDeleted(bookToDelete.Id);
 
             if (_bookDatasFlags.ContainsKey(bookToDelete)
              && _bookDatasFlags[bookToDelete] == DataStateFlag.Created)
@@ -173,10 +184,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             }
         }
 
-        private void OnBookAuthorDatasChanged(Int32 bookAuthorId)
-        {
-            BookAuthorDatasChanged?.Invoke(this, bookAuthorId);
-        }
         public void CreateBookAuthor(BookAuthorData bookAuthorData)
         {
             if (bookAuthorData == null)
@@ -199,10 +206,15 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
 
             _bookAuthorDatas.Add(bookAuthorData);
             _bookAuthorsDatasFlags[bookAuthorData] = DataStateFlag.Created;
-            OnBookAuthorDatasChanged(bookAuthorData.Id);
+
+            if (bookAuthorData.AuthorData.BookDatas == null
+             || bookAuthorData.BookData.AuthorDatas == null)
+            {
+                throw new ArgumentException("Invalid BookAuthor data.", nameof(bookAuthorData));
+            }
 
             bookAuthorData.AuthorData.BookDatas.Add(bookAuthorData.BookData);
-            OnAuthorDatasChanged(bookAuthorData.AuthorData.Id);
+            OnAuthorDatasAdded(bookAuthorData.AuthorData.Id);
 
             bookAuthorData.BookData.AuthorDatas.Add(bookAuthorData.AuthorData);
             OnBookDatasChanged(bookAuthorData.BookData.Id);
@@ -212,14 +224,22 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             BookAuthorData bookAuthorData = _bookAuthorDatas.FirstOrDefault(bad => bad.Id == bookAuthorId)
                 ?? throw new ArgumentException("BookAuthor not in the collection.", nameof(bookAuthorId));
 
-            if (_authorDatas.Contains(bookAuthorData.AuthorData) == false
+            if (bookAuthorData.AuthorData == null
+             || _authorDatas.Contains(bookAuthorData.AuthorData) == false
+             || bookAuthorData.BookData == null
              || _bookDatas.Contains(bookAuthorData.BookData) == false)
             {
                 throw new ArgumentException("BookAuthor holds invalid data.", nameof(bookAuthorId));
             }
 
+            if (bookAuthorData.AuthorData.BookDatas == null
+             || bookAuthorData.BookData.AuthorDatas == null)
+            {
+                throw new ArgumentException("Invalid BookAuthor data.", nameof(bookAuthorData));
+            }
+
             bookAuthorData.AuthorData.BookDatas.Remove(bookAuthorData.BookData);
-            OnAuthorDatasChanged(bookAuthorData.AuthorData.Id);
+            OnAuthorDatasAdded(bookAuthorData.AuthorData.Id);
 
             bookAuthorData.BookData.AuthorDatas.Remove(bookAuthorData.AuthorData);
             OnBookDatasChanged(bookAuthorData.BookData.Id);
@@ -234,12 +254,11 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             {
                 _bookAuthorsDatasFlags[bookAuthorData] = DataStateFlag.Deleted;
             }
-            OnBookAuthorDatasChanged(bookAuthorData.Id);
         }
 
-        private void OnAuthorDatasChanged(Int32 authorId)
+        private void OnAuthorDatasAdded(Int32 authorId)
         {
-            AuthorDatasChanged?.Invoke(this, authorId);
+            AuthorDataAdded?.Invoke(this, authorId);
         }
         public void CreateAuthor(AuthorData authorData, Int32 bookId)
         {
@@ -251,19 +270,27 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId)
                 ?? throw new ArgumentException("No book in the collection.", nameof(bookId));
 
-            if (AuthorDatas.Contains(authorData))
+            if (_authorDatas.Contains(authorData))
             {
-                throw new ArgumentException("Author already in the author collection.", nameof(bookId));
+                throw new ArgumentException("Author already in the author collection.", nameof(authorData));
             }
 
             authorData.Id = (_authorDatas.Count > 0 ? _authorDatas.Max(b => b.Id) : 0) + 1;
             _authorDatas.Add(authorData);
             _authorsDatasFlags.Add(authorData, DataStateFlag.Created);
 
-            CreateBookAuthor(new BookAuthorData((_bookAuthorDatas.Count > 0 ? _bookAuthorDatas.Max(bad => bad.Id) : 0) + 1,
-                bookData,
-                authorData));
-
+            try
+            {
+                CreateBookAuthor(new BookAuthorData((_bookAuthorDatas.Count > 0 ? _bookAuthorDatas.Max(bad => bad.Id) : 0) + 1,
+                    bookData,
+                    authorData));
+            }
+            catch (Exception)
+            {
+                _authorDatas.Remove(authorData);
+                _authorsDatasFlags.Remove(authorData);
+                throw;
+            }
         }
         public void AddAuthor(Int32 authorId, Int32 bookId)
         {
@@ -273,9 +300,19 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId)
                 ?? throw new ArgumentException("No book in the collection.", nameof(bookId));
 
+            if (authorData.BookDatas == null)
+            {
+                throw new Exception("Invalid book data.");
+            }
+
             if (authorData.BookDatas.Contains(bookData))
             {
                 throw new Exception("Book already in the book collection of the author.");
+            }
+
+            if (bookData.AuthorDatas == null)
+            {
+                throw new Exception("Invalid author data.");
             }
 
             if (bookData.AuthorDatas.Contains(authorData))
@@ -283,7 +320,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
                 throw new Exception("Author already in the author collection of the book.");
             }
 
-            if (_bookAuthorDatas.FirstOrDefault(bad => bad.AuthorData.Id == authorId && bad.BookData.Id == bookId) != null)
+            if (_bookAuthorDatas.FirstOrDefault(bad => bad.AuthorData?.Id == authorId && bad.BookData?.Id == bookId) != null)
             {
                 throw new Exception("BookAuthor already in the collection.");
             }
@@ -309,15 +346,11 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             {
                 _authorsDatasFlags[oldAuthorData] = DataStateFlag.Updated;
             }
-            OnAuthorDatasChanged(oldAuthorData.Id);
+            OnAuthorDatasAdded(oldAuthorData.Id);
 
-            foreach (BookData bookData in oldAuthorData.BookDatas)
+            if (oldAuthorData.BookDatas == null)
             {
-                if (_bookDatas.Contains(bookData) == false)
-                {
-                    throw new Exception("Book is not in the collection.");
-                }
-                OnBookDatasChanged(bookData.Id);
+                throw new Exception("Ivalid author data.");
             }
         }
         public void RemoveAuthor(Int32 authorId, Int32 bookId)
@@ -328,9 +361,19 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId)
                 ?? throw new ArgumentException("No book in the collection.", nameof(bookId));
 
+            if (authorData.BookDatas == null)
+            {
+                throw new Exception("Invalid book data.");
+            }
+
             if (authorData.BookDatas.Contains(bookData) == false)
             {
                 throw new Exception("Book not in the book collection of the author.");
+            }
+
+            if (bookData.AuthorDatas == null)
+            {
+                throw new Exception("Invalid author data.");
             }
 
             if (bookData.AuthorDatas.Contains(authorData) == false)
@@ -338,33 +381,34 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
                 throw new Exception("Author not in the author collection of the book.");
             }
 
-            BookAuthorData bookAuthorData = _bookAuthorDatas.FirstOrDefault(bad => bad.AuthorData.Id == authorId && bad.BookData.Id == bookId)
+            BookAuthorData bookAuthorData = _bookAuthorDatas.FirstOrDefault(bad => bad.AuthorData?.Id == authorId && bad.BookData?.Id == bookId)
                 ?? throw new Exception("BookAuthor not in the collection.");
 
             DeleteBookAuthor(bookAuthorData.Id);
         }
 
-        private void OnCoverDatasChanged(Int32 coverId)
+        private void OnCoverDatasAdded(Int32 coverId)
         {
-            CoverDatasChanged?.Invoke(this, coverId);
+            CoverDataAdded?.Invoke(this, coverId);
         }
         public CoverData CreateCover(Int32 bookId, Byte[] image)
         {
             BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == bookId)
                 ?? throw new Exception(String.Format("No book found with id: {0}", bookId));
 
-            Int32 coverId = (_coverDatas.Count > 0 ? _bookDatas.Max(b => b.Id) : 0) +1;
-            _coverDatas.Add(new CoverData(coverId, image));
+            Int32 coverId = (_coverDatas.Count > 0 ? _bookDatas.Max(b => b.Id) : 0) + 1;
+            _coverDatas.Add(new CoverData(coverId, image, bookData));
+            OnCoverDatasAdded(coverId);
 
             bookData.Cover = _coverDatas.FirstOrDefault(c => c.Id == coverId)
                 ?? throw new Exception(String.Format("No cover found with id: {0}", coverId));
+            OnBookDatasChanged(bookData.Id);
 
             if (_bookDatasFlags.ContainsKey(bookData) == false
              || _bookDatasFlags[bookData] == DataStateFlag.Deleted)
             {
                 _bookDatasFlags[bookData] = DataStateFlag.Updated;
             }
-
             _coversDatasFlags[bookData.Cover] = DataStateFlag.Created;
 
             return bookData.Cover;
@@ -377,7 +421,16 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             CoverData coverData = _coverDatas.FirstOrDefault(c => c.Id == coverId)
                 ?? throw new Exception(String.Format("No cover found with id: {0}", coverId));
 
+            if (coverData.BookDatas == null)
+            {
+                throw new Exception(String.Format("Invalid coverData: {0}", coverId));
+            }
+
             bookData.Cover = coverData;
+            OnBookDatasChanged(bookData.Id);
+
+            coverData.BookDatas.Add(bookData);
+            OnCoverDatasAdded(coverData.Id);
 
             if (_bookDatasFlags.ContainsKey(bookData) == false
              || _bookDatasFlags[bookData] == DataStateFlag.Deleted)
@@ -392,12 +445,20 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             BookData bookData = _bookDatas.FirstOrDefault(b => bookId == b.Id)
                 ?? throw new Exception(String.Format("No book found with id: {0}", bookId));
 
-            if (bookData.Cover == null)
+            if (bookData.Cover == null
+             || bookData.Cover.BookDatas == null
+             || bookData.Cover.BookDatas.Contains(bookData) == false)
             {
-                throw new Exception(String.Format("Book has no cover: {0}", bookId));
+                throw new Exception(String.Format("Invalid book with id: {0}", bookId));
             }
 
+            Int32 coverId = bookData.Cover.Id;
+
+            bookData.Cover.BookDatas.Remove(bookData);
+            OnCoverDatasAdded(coverId);
+
             bookData.Cover = null;
+            OnBookDatasChanged(bookData.Id);
 
             if (_bookDatasFlags.ContainsKey(bookData) == false
              || _bookDatasFlags[bookData] == DataStateFlag.Deleted)
@@ -406,10 +467,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             }
         }
 
-        private void OnVolumeDatasChanged(String volumeDataId)
-        {
-            VolumeDatasChanged?.Invoke(this, volumeDataId);
-        }
         public void CreateVolume(VolumeData volumeData, Int32 bookId)
         {
             if (volumeData == null)
@@ -427,33 +484,37 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
 
             volumeData.Id = Guid.NewGuid().ToString();
             volumeData.BookData = bookData;
+            OnBookDatasChanged(bookData.Id);
 
-            _volumesDatasFlags.Add(volumeData, DataStateFlag.Created);
             _volumeDatas.Add(volumeData);
 
-            OnVolumeDatasChanged(volumeData.Id);
-            OnBookDatasChanged(bookData.Id);
+            _volumesDatasFlags.Add(volumeData, DataStateFlag.Created);
         }
         public void UpdateVolume(VolumeData volumeData)
         {
             VolumeData oldVolumeData = _volumeDatas.FirstOrDefault(v => v.Equals(volumeData))
-                ?? throw new Exception(String.Format("No book found with id: {0}", volumeData));
+                ?? throw new ArgumentException(String.Format("No book found.", volumeData));
 
             if (oldVolumeData.BookData == null)
             {
-                throw new Exception(String.Format("Invalid volume without book: {0}", volumeData));
+                throw new Exception(String.Format("Invalid volume without book: {0}", oldVolumeData));
             }
 
-            BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == oldVolumeData.BookData.Id)
-                ?? throw new Exception(String.Format("No book found with id: {0}", oldVolumeData));
+            BookData bookData = _bookDatas.FirstOrDefault(b => b.Id == oldVolumeData.BookData?.Id)
+                ?? throw new Exception(String.Format("No book found with id: {0}", oldVolumeData.BookData.Id));
 
             if (volumeData.IsSortedOut == true)
             {
-                foreach (LendingData lendingData in volumeData.Lendings)
+                foreach (LendingData lendingData in volumeData.LendingDatas)
                 {
-                    if (IsStopingSortingOutLending(lendingData))
+                    if (IsStopingSortingOutVolumeLending(lendingData))
                     {
                         throw new Exception(String.Format("Volume can not be sorted out: {0}", oldVolumeData));
+                    }
+
+                    if (GetLendingDataState(lendingData) != LendingState.RETURNED)
+                    {
+                        DeleteLending(lendingData.Id);
                     }
                 }
             }
@@ -464,25 +525,30 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             {
                 _volumesDatasFlags[oldVolumeData] = DataStateFlag.Updated;
             }
-            OnVolumeDatasChanged(oldVolumeData.Id);
-
-            OnBookDatasChanged(bookData.Id);
-
         }
         public void DeleteVolume(String volumeDataId)
         {
             VolumeData volumeData = _volumeDatas.FirstOrDefault(v => v.Id == volumeDataId)
                 ?? throw new ArgumentException("Volume is not in the collection.", nameof(volumeDataId));
 
-            if (_bookDatas.Contains(volumeData.BookData) == false)
+            if (volumeData.BookData == null
+            || _bookDatas.Contains(volumeData.BookData) == false
+            || volumeData.BookData.VolumeDatas == null)
             {
-                throw new ArgumentException("Volume holds invalid data.", nameof(volumeDataId));
+                throw new ArgumentException("Volume holds invalid data.", nameof(volumeData));
+            }
+
+            if (volumeData.LendingDatas != null
+             && volumeData.LendingDatas.Count > 0)
+            {
+                throw new ArgumentException("Volume lending collection holds data.", nameof(volumeData));
             }
 
             volumeData.BookData.VolumeDatas.Remove(volumeData);
             OnBookDatasChanged(volumeData.BookData.Id);
 
             _volumeDatas.Remove(volumeData);
+
             if (_volumesDatasFlags.ContainsKey(volumeData)
              && _volumesDatasFlags[volumeData] == DataStateFlag.Created)
             {
@@ -492,12 +558,78 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             {
                 _volumesDatasFlags[volumeData] = DataStateFlag.Deleted;
             }
-            OnVolumeDatasChanged(volumeData.Id);
         }
 
         private void OnLendingDatasChanged(Int32 lendingId)
         {
-            LendingDatasChanged?.Invoke(this, lendingId);
+            LendingDataChanged?.Invoke(this, lendingId);
+        }
+        public void TurnLending(LendingData lendingData)
+        {
+            LendingData oldLendingData = _lendingDatas.FirstOrDefault(v => v.Equals(lendingData))
+                ?? throw new ArgumentException(String.Format("No lending found.", lendingData));
+
+            if (oldLendingData.VolumeData == null)
+            {
+                throw new Exception(String.Format("Invalid lending without book: {0}", oldLendingData));
+            }
+
+            VolumeData volumeData = _volumeDatas.FirstOrDefault(b => b.Id == oldLendingData.VolumeData?.Id)
+                ?? throw new Exception(String.Format("No volume found with id: {0}", oldLendingData.VolumeData.Id));
+
+            if (IsLendableLending(lendingData))
+            {
+                oldLendingData.Active = true;
+            }
+            else if (IsReturnableLending(lendingData))
+            {
+                oldLendingData.Active = false;
+            }
+            else
+            {
+                throw new Exception(String.Format("Lending can not be turned: {0}", oldLendingData.Id));
+            }
+            
+            OnLendingDatasChanged(oldLendingData.Id);
+
+            if (_lendingsDatasFlags.ContainsKey(oldLendingData) == false
+             || _lendingsDatasFlags[oldLendingData] == DataStateFlag.Deleted)
+            {
+                _lendingsDatasFlags[oldLendingData] = DataStateFlag.Updated;
+            }
+        }
+        public void DeleteLending(Int32 lendingDataId)
+        {
+            LendingData lendingData = _lendingDatas.FirstOrDefault(v => v.Id == lendingDataId)
+                ?? throw new ArgumentException("Lending is not in the collection.", nameof(lendingDataId));
+
+            if (IsStopingSortingOutVolumeLending(lendingData))
+            {
+                throw new Exception(String.Format("Lending can not be DELETED: {0}", lendingData));
+            }
+
+            if (lendingData.VolumeData == null
+            || _volumeDatas.Contains(lendingData.VolumeData) == false
+            || lendingData.VolumeData.LendingDatas == null
+            || lendingData.VolumeData.LendingDatas.Contains(lendingData) == false)
+            {
+                throw new ArgumentException("Lending holds invalid data.", nameof(lendingData));
+            }
+
+            lendingData.VolumeData.LendingDatas.Remove(lendingData);
+            OnLendingDatasChanged(lendingData.Id);
+
+            _lendingDatas.Remove(lendingData);
+
+            if (_lendingsDatasFlags.ContainsKey(lendingData)
+             && _lendingsDatasFlags[lendingData] == DataStateFlag.Created)
+            {
+                _lendingsDatasFlags.Remove(lendingData);
+            }
+            else
+            {
+                _lendingsDatasFlags[lendingData] = DataStateFlag.Deleted;
+            }
         }
 
         public async Task LoadAsync()
@@ -522,7 +654,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
 
             LinkingDataLists();
         }
-
         private void LinkingDataLists()
         {
             foreach (BookAuthorData bookAuthorData in _bookAuthorDatas)
@@ -543,6 +674,8 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
                     CoverData coverData = _coverDatas.FirstOrDefault(cd => cd.Equals(bookData.Cover))
                         ?? throw new Exception("The cover does not exist.");
                     bookData.Cover = coverData;
+
+                    coverData.BookDatas.Add(bookData);
                 }
 
                 bookData.AuthorDatas = new List<AuthorData>(_bookAuthorDatas.Where(bad => bad.BookData.Equals(bookData)).Select(bad => bad.AuthorData));
@@ -556,7 +689,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
 
             foreach (VolumeData volumeData in _volumeDatas)
             {
-                volumeData.Lendings = new List<LendingData>(_lendingDatas.Where(ld => ld.VolumeData.Equals(volumeData)));
+                volumeData.LendingDatas = new List<LendingData>(_lendingDatas.Where(ld => ld.VolumeData.Equals(volumeData)));
             }
 
             foreach (LendingData lendingData in _lendingDatas)
@@ -571,7 +704,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             await SaveBooksAsync();
             await SaveAuthorsAsync();
         }
-
         private async Task SaveBooksAsync()
         {
             List<BookData> booksToSave = _bookDatasFlags.Keys.ToList();
@@ -633,13 +765,13 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             }
         }
 
-        private LendingState GetState(LendingData lendingData)
+        private LendingState GetLendingDataState(LendingData lendingData)
         {
             DateTime now = DateTime.UtcNow;
 
             if (now < lendingData.StartDate)
             {
-                if (lendingData.Active == 0)
+                if (lendingData.Active == false)
                 {
                     return LendingState.TOO_SOON_TO_PICK_UP;
                 }
@@ -651,11 +783,11 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
 
             if (now < lendingData.EndDate)
             {
-                if (lendingData.Active == 0)
+                if (lendingData.Active == false)
                 {
                     return LendingState.READY_TO_PICK_UP;
                 }
-                else if (lendingData.Active == 1)
+                else if (lendingData.Active == true)
                 {
                     return LendingState.PICKED_UP;
                 }
@@ -665,11 +797,11 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
                 }
             }
 
-            if (lendingData.Active == 0)
+            if (lendingData.Active == false)
             {
                 return LendingState.NOT_PICKED_UP;
             }
-            else if (lendingData.Active == 1)
+            else if (lendingData.Active == true)
             {
                 return LendingState.NOT_RETURNED;
             }
@@ -678,13 +810,12 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
                 return LendingState.RETURNED;
             }
         }
-        private Boolean IsStopingSortingOutLending(LendingData lendingData)
+        private Boolean IsStopingSortingOutVolumeLending(LendingData lendingData)
         {
-            LendingState lendingState = GetState(lendingData);
+            LendingState lendingState = GetLendingDataState(lendingData);
 
             if (lendingState == LendingState.ERROR
              || lendingState == LendingState.NOT_RETURNED
-             || lendingState == LendingState.OVERDUE_TO_RETURN
              || lendingState == LendingState.PICKED_UP)
             {
                 return true;
@@ -692,15 +823,49 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
 
             return false;
         }
-        private Boolean IsFinishedReturnedLending(LendingData lendingData)
+        private Boolean IsReturnableLending(LendingData lendingData)
         {
-            LendingState lendingState = GetState(lendingData);
+            LendingState lendingState = GetLendingDataState(lendingData);
 
-            if (lendingState == LendingState.RETURNED
-             || lendingState == LendingState.PICKED_UP
-             || lendingState == LendingState.OVERDUE_TO_RETURN)
+            if (lendingState == LendingState.NOT_RETURNED
+             || lendingState == LendingState.PICKED_UP)
             {
                 return true;
+            }
+
+            return false;
+        }
+        private Boolean IsLendableLending(LendingData lendingData)
+        {
+            LendingState lendingState = GetLendingDataState(lendingData);
+
+            if (lendingState == LendingState.READY_TO_PICK_UP)
+            {
+                return true;
+            }
+
+            if (lendingState == LendingState.TOO_SOON_TO_PICK_UP)
+            {
+                foreach (LendingData otherLendingData in lendingData.VolumeData.LendingDatas)
+                {
+                    LendingState otherLendingState = GetLendingDataState(otherLendingData);
+
+                    if (otherLendingState == LendingState.NOT_RETURNED
+                     || otherLendingState == LendingState.PICKED_UP
+                     || otherLendingState == LendingState.READY_TO_PICK_UP)
+                    {
+                        return false;
+                    }
+
+                    if (otherLendingState == LendingState.TOO_SOON_TO_PICK_UP
+                     && otherLendingData != lendingData)
+                    {
+                        if (otherLendingData.StartDate < lendingData.StartDate)
+                        {
+                            return false;
+                        }
+                    }
+                }
             }
 
             return false;

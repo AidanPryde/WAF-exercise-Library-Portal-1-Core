@@ -11,7 +11,6 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models
         READY_TO_PICK_UP,
         NOT_PICKED_UP,
         RETURNED,
-        OVERDUE_TO_RETURN,
         NOT_RETURNED,
         ERROR
     }
@@ -83,13 +82,13 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models
             }
         }
 
-        public Boolean IsFinishedReturnedLending()
+        public Boolean IsReturnedOrTheyHaveItLending()
         {
             LendingState lendingState = GetState();
 
             if (lendingState == LendingState.RETURNED
              || lendingState == LendingState.PICKED_UP
-             || lendingState == LendingState.OVERDUE_TO_RETURN)
+             || lendingState == LendingState.NOT_RETURNED)
             {
                 return true;
             }

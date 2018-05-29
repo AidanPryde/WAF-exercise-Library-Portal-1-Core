@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using Microsoft.Win32;
+
 using WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects;
 using WAF_exercise_Library_Portal_1_Core_WPF.Models;
 using WAF_exercise_Library_Portal_1_Core_WPF.Persistence;
@@ -80,6 +82,33 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             }
         }
 
+        private ObservableCollection<Int32> _coverIds;
+        public ObservableCollection<Int32> CoverIds
+        {
+            get { return _coverIds; }
+            private set
+            {
+                if (_coverIds != value)
+                {
+                    _coverIds = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        private Int32 _selectedAddingCoverDataId;
+        public Int32 SelectedAddingCoverDataId
+        {
+            get { return _selectedAddingCoverDataId; }
+            set
+            {
+                if (_selectedAddingCoverDataId != value)
+                {
+                    _selectedAddingCoverDataId = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private VolumeData _selectedVolumeData;
         public VolumeData SelectedVolumeData
         {
@@ -121,10 +150,13 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 
         public event EventHandler<AuthorEditingEventArgs> AuthorEditingStarted;
 
-        public DelegateCommand AddVolumeCommand { get; private set; }
+        public DelegateCommand CreateCoverCommand { get; private set; }
+        public DelegateCommand AddCoverCommand { get; private set; }
+        public DelegateCommand RemoveCoverCommand { get; private set; }
+
+        public DelegateCommand CreateVolumeCommand { get; private set; }
         public DelegateCommand UpdateVolumeCommand { get; private set; }
         public DelegateCommand DeleteVolumeCommand { get; private set; }
-        public DelegateCommand ShortOutVolumeCommand { get; private set; }
 
         public event EventHandler<VolumeEditingEventArgs> VolumeEditingStarted;
 
@@ -140,22 +172,30 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             _model = model ?? throw new ArgumentNullException(nameof(model));
 
             _model.BookDatasChanged += Model_BookChanged;
+            _model.BookAuthorDatasChanged += Model_BookAuthorDatasChanged;
+            _model.AuthorDataAdded += Model_AuthorDatasChanged;
+            _model.CoverDataAdded += Model_CoverDatasChanged;
+            _model.LendingDataChanged += Model_LendingDatasChanged;
+            _model.VolumeDatasChanged += Model_VolumeDatasChanged;
+
             _isLoaded = false;
 
             CreateBookCommand = new DelegateCommand(param => CreateBook());
-            UpdateBookCommand = new DelegateCommand(param => UpdateBook(param as BookData));
-            DeleteBookCommand = new DelegateCommand(param => DeleteBook(param as BookData));
-
+            UpdateBookCommand = new DelegateCommand(param => UpdateBook());
+            DeleteBookCommand = new DelegateCommand(param => DeleteBook());
 
             CreateAuthorCommand = new DelegateCommand(param => CreateAuthor());
-            UpdateAuthorCommand = new DelegateCommand(param => UpdateAuthor(param as AuthorData));
+            UpdateAuthorCommand = new DelegateCommand(param => UpdateAuthor());
             AddAuthorCommand = new DelegateCommand(param => AddAuthor());
-            RemoveAuthorCommand = new DelegateCommand(param => RemoveAuthor(param as AuthorData));
+            RemoveAuthorCommand = new DelegateCommand(param => RemoveAuthor());
 
-            AddVolumeCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
-            UpdateVolumeCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
-            DeleteVolumeCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
-            ShortOutVolumeCommand = new DelegateCommand(param => OnImageEditingStarted((param as BookData).Id));
+            CreateCoverCommand = new DelegateCommand((param) => CreateCover());
+            AddCoverCommand = new DelegateCommand((param) => AddCover());
+            RemoveCoverCommand = new DelegateCommand((param) => RemoveCover());
+
+            CreateVolumeCommand = new DelegateCommand(param => CreateVolume());
+            UpdateVolumeCommand = new DelegateCommand(param => UpdateVolume());
+            DeleteVolumeCommand = new DelegateCommand(param => DeleteVolume());
 
             LoadCommand = new DelegateCommand(param => LoadAsync());
             SaveCommand = new DelegateCommand(param => SaveAsync());
@@ -166,22 +206,26 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         {
             OnBookEditingStarted(new BookData());
         }
-        private void UpdateBook(BookData bookData)
+        private void UpdateBook()
         {
-            if (bookData == null || BookDatas.Contains(bookData) == false)
+            if (SelectedBookData == null || BookDatas.Contains(SelectedBookData) == false)
             {
-                OnMessageApplication(String.Format("Failed to DELETE book.{0}Info: Local sync problem.", Environment.NewLine));
+                OnMessageApplication(String.Format("Failed to UPDATE book.{0}Info: Local sync problem.", Environment.NewLine));
                 return;
             }
 
-            OnBookEditingStarted(new BookData(bookData.Id, bookData.Title, bookData.PublishedYear, bookData.Isbn, bookData.Cover));
+            OnBookEditingStarted(new BookData(SelectedBookData.Id,
+                SelectedBookData.Title,
+                SelectedBookData.PublishedYear,
+                SelectedBookData.Isbn,
+                SelectedBookData.Cover));
         }
-        private void DeleteBook(BookData bookData)
+        private void DeleteBook()
         {
-            if (bookData == null
-             || BookDatas.Contains(bookData) == false
-             || bookData.AuthorDatas.Any()
-             || bookData.VolumeDatas.Any())
+            if (SelectedBookData == null
+             || BookDatas.Contains(SelectedBookData) == false
+             || SelectedBookData.AuthorDatas.Any()
+             || SelectedBookData.VolumeDatas.Any())
             {
                 OnMessageApplication(String.Format("Failed to DELETE book.{0}Info: Local sync problem or still active links to other datas.", Environment.NewLine));
                 return;
@@ -189,16 +233,13 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 
             try
             {
-                _model.DeleteBook(bookData);
-
-                BookDatas.Remove(bookData);
+                _model.DeleteBook(SelectedBookData);
             }
             catch (Exception exception)
             {
                 OnMessageApplication(String.Format("Failed to DELETE book.{0}Info: {1}", Environment.NewLine, exception.Message));
             }
         }
-
         private void OnBookEditingStarted(BookData bookData)
         {
             BookEditingStarted?.Invoke(this, bookData);
@@ -221,33 +262,44 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             SelectedBookData = BookDatas[index];
         }
 
+        private void Model_BookAuthorDatasChanged(Object sender, int e)
+        {
+            //throw new NotImplementedException();
+        }
+
         private void CreateAuthor()
         {
-            if (SelectedBookData == null || BookDatas.Contains(SelectedBookData) == false)
+            if (SelectedBookData == null
+             || BookDatas.Contains(SelectedBookData) == false)
             {
+                OnMessageApplication(String.Format("Failed to CREATE author.{0}Info: Local sync problem.", Environment.NewLine));
                 return;
             }
 
             OnAuthorEditingStarted(new AuthorData(), SelectedBookData.Id);
         }
-        private void UpdateAuthor(AuthorData authorData)
+        private void UpdateAuthor()
         {
             if (SelectedBookData == null
              || BookDatas.Contains(SelectedBookData) == false
-             || authorData == null
-             || BookDatas.First(b => b.Equals(SelectedBookData)).AuthorDatas.Contains(authorData) == false)
+             || SelectedAuthorData == null
+             || BookDatas.First(b => b.Equals(SelectedBookData)).AuthorDatas.Contains(SelectedAuthorData) == false)
             {
+                OnMessageApplication(String.Format("Failed to UPDATE author.{0}Info: Local sync problem.", Environment.NewLine));
                 return;
             }
 
-            OnAuthorEditingStarted(authorData, SelectedBookData.Id);
+            OnAuthorEditingStarted(SelectedAuthorData, SelectedBookData.Id);
         }
         private void AddAuthor()
         {
-            if (SelectedBookData == null || BookDatas.Contains(SelectedBookData) == false
-             || SelectedAddingAuthorData == null || AuthorDatas.Contains(SelectedAddingAuthorData) == false
+            if (SelectedBookData == null
+             || BookDatas.Contains(SelectedBookData) == false
+             || SelectedAddingAuthorData == null
+             || AuthorDatas.Contains(SelectedAddingAuthorData) == false
              || SelectedBookData.AuthorDatas.Contains(SelectedAddingAuthorData))
             {
+                OnMessageApplication(String.Format("Failed to ADD author.{0}Info: Local sync problem.", Environment.NewLine));
                 return;
             }
 
@@ -259,37 +311,134 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             {
                 OnMessageApplication(String.Format("Failed to ADD author.{0}Info: {1}", Environment.NewLine, exception.Message));
             }
-            
         }
-        private void RemoveAuthor(AuthorData authorData)
+        private void RemoveAuthor()
         {
             if (SelectedBookData == null
              || BookDatas.Contains(SelectedBookData) == false
-             || authorData == null)
+             || SelectedAuthorData == null
+             || BookDatas.First(b => b.Equals(SelectedBookData)).AuthorDatas.Contains(SelectedAuthorData) == false)
             {
-                return;
-            }
-
-            BookData book = BookDatas.First(b => b.Equals(SelectedBookData));
-
-            if (book.AuthorDatas.Contains(authorData) == false)
-            {
+                OnMessageApplication(String.Format("Failed to REMOVE author.{0}Info: Local sync problem.", Environment.NewLine));
                 return;
             }
 
             try
             {
-                _model.RemoveAuthor(authorData.Id, book.Id);
+                _model.RemoveAuthor(SelectedAuthorData.Id, SelectedBookData.Id);
             }
             catch (Exception exception)
             {
                 OnMessageApplication(String.Format("Failed to DELETE book.{0}Info: {1}", Environment.NewLine, exception.Message));
             }
         }
-
         private void OnAuthorEditingStarted(AuthorData authorData, Int32 bookId)
         {
             AuthorEditingStarted?.Invoke(this, new AuthorEditingEventArgs(authorData, bookId));
+        }
+        private void Model_AuthorDatasChanged(Object sender, int e)
+        {
+            OnPropertyChanged("BookDatas");
+            OnPropertyChanged("AuthorDatas");
+        }
+
+        private void CreateCover()
+        {
+            try
+            {
+                if (SelectedBookData == null
+                 || SelectedBookData.Cover != null)
+                {
+                    return;
+                }
+
+                OpenFileDialog dialog = new OpenFileDialog
+                {
+                    CheckFileExists = true,
+                    Filter = "Images|*.jpg;*.jpeg;*.bmp;*.tif;*.gif;*.png;",
+                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
+                };
+                Boolean? result = dialog.ShowDialog();
+
+                if (result == true)
+                {
+                    CoverData newCoverData = _model.CreateCover(SelectedBookData.Id,
+                                            ImageHandler.OpenAndResize(dialog.FileName, 300));
+
+                    CoverIds.Add(newCoverData.Id);
+                }
+            }
+            catch (Exception exception)
+            {
+                OnMessageApplication(String.Format("Failed to CREATE cover.{0}Info: {1}", Environment.NewLine, exception.Message));
+            }
+        }
+        private void AddCover()
+        {
+            try
+            {
+                if (SelectedBookData == null)
+                {
+                    OnMessageApplication(String.Format("Failed to ADD cover.{0}Info: Invalid cover is null.", Environment.NewLine));
+                    return;
+                }
+
+                CoverData coverData = _model.AddCover(SelectedBookData.Id, SelectedAddingCoverDataId);
+            }
+            catch (Exception exception)
+            {
+                OnMessageApplication(String.Format("Failed to ADD cover.{0}Info: {1}", Environment.NewLine, exception.Message));
+            }
+        }
+        private void RemoveCover()
+        {
+            if (SelectedBookData == null
+             || SelectedBookData.Cover == null)
+            {
+                OnMessageApplication(String.Format("Failed to REMOVE cover.{0}Info: Invalid cover is null.", Environment.NewLine));
+                return;
+            }
+
+            try
+            {
+                _model.RemoveCover(SelectedBookData.Id);
+            }
+            catch (Exception exception)
+            {
+                OnMessageApplication(String.Format("Failed to REMOVE cover.{0}Info: {1}", Environment.NewLine, exception.Message));
+            }
+
+        }
+        private void Model_CoverDatasChanged(Object sender, int e)
+        {
+            OnPropertyChanged("BookDatas");
+            OnPropertyChanged("CoverDatas");
+        }
+
+        private void CreateVolume()
+        {
+            //throw new NotImplementedException();
+        }
+        private void UpdateVolume()
+        {
+            //throw new NotImplementedException();
+        }
+        private void DeleteVolume()
+        {
+            //throw new NotImplementedException();
+        }
+        private void OnVolumeEditingStarted(VolumeData volumeData, Int32 bookId)
+        {
+            VolumeEditingStarted?.Invoke(this, new VolumeEditingEventArgs(volumeData, bookId));
+        }
+        private void Model_VolumeDatasChanged(Object sender, string e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void Model_LendingDatasChanged(Object sender, int e)
+        {
+            //throw new NotImplementedException();
         }
 
         private async void LoadAsync()
@@ -300,6 +449,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 
                 BookDatas = new ObservableCollection<BookData>(_model.BookDatas);
                 AuthorDatas = new ObservableCollection<AuthorData>(_model.AuthorDatas);
+                CoverIds = new ObservableCollection<Int32>(_model.CoverDatas.Select(c => c.Id));
 
                 IsLoaded = true;
             }
@@ -308,7 +458,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
                 OnMessageApplication("Loading failed! No connection to data.");
             }
         }
-
         private async void SaveAsync()
         {
             try
@@ -325,17 +474,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         private void OnExitApplication()
         {
             ExitApplication?.Invoke(this, EventArgs.Empty);
-        }
-
-        
-
-        /// <summary>
-        /// Képszerkesztés elindításának eseménykiváltása.
-        /// </summary>
-        /// <param name="buildingId">Épület azonosító.</param>
-        private void OnImageEditingStarted(Int32 buildingId)
-        {
-            //ImageUploadingStarted?.Invoke(this, new BuildingEventArgs { BuildingId = buildingId });
         }
     }
 }
