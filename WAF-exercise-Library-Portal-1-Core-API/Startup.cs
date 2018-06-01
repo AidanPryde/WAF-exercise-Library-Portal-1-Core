@@ -79,7 +79,7 @@ namespace WAF_exercise_Library_Portal_1_Core_API
 
             app.UseMvc();
 
-            DbInitializer.Initialize(app.ApplicationServices.GetRequiredService<LibraryDbContext>(),
+            DbInitializer.Initialize(serviceProvider.GetRequiredService<LibraryDbContext>(),
                 serviceProvider.GetRequiredService<UserManager<ApplicationUser>>(),
                 serviceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>(),
                 "..\\Data\\Images\\Covers");

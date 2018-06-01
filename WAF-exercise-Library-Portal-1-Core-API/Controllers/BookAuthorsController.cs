@@ -3,9 +3,10 @@ using System.Linq;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 using WAF_exercise_Library_Portal_1_Core_Db;
+using WAF_exercise_Library_Portal_1_Core_Db.Models;
 using WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects;
 
 namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
@@ -31,8 +32,8 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                         .BookAuthor
                         .ToList()
                         .Select(ba => new BookAuthorData(ba.Id,
-                        new BookData(ba.BookId),
-                        new AuthorData(ba.AuthorId))));
+                            new BookData(ba.BookId),
+                            new AuthorData(ba.AuthorId))));
             }
             catch
             {
@@ -41,29 +42,80 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
             }
         }
 
-        // GET: api/BookAuthors/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        // GET: api/Authors/{id}
+        [HttpGet("{id}", Name = "GetBookAuthor")]
+        public IActionResult GetBookAuthor(Int32 id)
         {
-            return "value";
+            try
+            {
+                return Ok(_context
+                        .BookAuthor
+                        .Where(ba => ba.Id == id)
+                        .Select(ba => new BookAuthorData(ba.Id,
+                            new BookData(ba.BookId),
+                            new AuthorData(ba.AuthorId)))
+                        .Single());
+            }
+            catch
+            {
+                // Internal Server Error
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
-        
+
         // POST: api/BookAuthors
+        [Authorize(Roles = "admin")]
         [HttpPost]
-        public void Post([FromBody]string value)
+        public IActionResult Post([FromBody] BookAuthorData bookAuthorData)
         {
-        }
-        
-        // PUT: api/BookAuthors/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
+            try
+            {
+                if (bookAuthorData.BookData == null || bookAuthorData.AuthorData == null)
+                {
+                    return NoContent();
+                }
+
+                var addedBookAuthor = _context.BookAuthor.Add(new BookAuthor
+                {
+                    BookId = bookAuthorData.BookData.Id,
+                    AuthorId = bookAuthorData.AuthorData.Id
+                });
+
+                _context.SaveChanges();
+
+                return Ok(addedBookAuthor.Entity.Id);
+            }
+            catch
+            {
+                // Internal Server Error
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         // DELETE: api/BookAuthors/5
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(Int32 id)
         {
+            try
+            {
+                BookAuthor bookAuthor = _context.BookAuthor.FirstOrDefault(ba => ba.Id == id);
+
+                if (bookAuthor == null)
+                {
+                    return NotFound();
+                }
+
+                _context.BookAuthor.Remove(bookAuthor);
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            catch
+            {
+                // Internal Server Error
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

@@ -20,11 +20,11 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
             };
         }
 
-        public async Task<Boolean> LoginAsync(LoginData user)
+        public async Task<Boolean> LoginAsAdminAsync(LoginData user)
         {
             try
             {
-                HttpResponseMessage response = await _client.PostAsJsonAsync("api/Account/Login", user);
+                HttpResponseMessage response = await _client.PostAsJsonAsync("api/Account/LoginAsAdmin", user);
                 return response.IsSuccessStatusCode;
             }
             catch (Exception exception)
@@ -69,7 +69,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
         {
             try
             {
-                HttpResponseMessage response = await _client.PostAsJsonAsync("api/Books", bookData);
+                HttpResponseMessage response = await _client.PostAsJsonAsync("api/Books", new BookData(bookData.Id, bookData.Title, bookData.PublishedYear, bookData.Isbn, new CoverData(bookData.Cover.Id, bookData.Cover?.Image)));
                 bookData.Id = (await response.Content.ReadAsAsync<Int32>());
                 return response.IsSuccessStatusCode;
             }
@@ -82,7 +82,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
         {
             try
             {
-                HttpResponseMessage response = await _client.PutAsJsonAsync("api/Books/", bookData);
+                HttpResponseMessage response = await _client.PutAsJsonAsync("api/Books/", new BookData(bookData.Id, bookData.Title, bookData.PublishedYear, bookData.Isbn, new CoverData(bookData.Cover.Id, bookData.Cover?.Image)));
                 return response.IsSuccessStatusCode;
             }
             catch (Exception exception)
@@ -122,14 +122,30 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
                 throw new PersistenceUnavailableException(exception);
             }
         }
-
-        public Task<bool> AddBookAuthorAsync(BookAuthorData bookAuthorData)
+        public async Task<Boolean> CreateBookAuthorAsync(BookAuthorData bookAuthorData)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpResponseMessage response = await _client.PostAsJsonAsync("api/BookAuthors", new BookAuthorData(bookAuthorData.Id, new BookData(bookAuthorData.BookData.Id), new AuthorData(bookAuthorData.AuthorData.Id)));
+                bookAuthorData.Id = (await response.Content.ReadAsAsync<Int32>());
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
         }
-        public Task<bool> RemoveBookAuthorAsync(BookAuthorData bookAuthorData)
+        public async Task<Boolean> DeleteBookAuthorAsync(BookAuthorData bookAuthorData)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpResponseMessage response = await _client.DeleteAsync("api/BookAuthors/" + bookAuthorData.Id);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
         }
 
         public async Task<IEnumerable<AuthorData>> ReadAuthorsAsync()
@@ -151,17 +167,30 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
                 throw new PersistenceUnavailableException(exception);
             }
         }
-        public Task<Boolean> AddAuthorAsync(AuthorData authorData)
+        public async Task<Boolean> CreateAuthorAsync(AuthorData authorData)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpResponseMessage response = await _client.PostAsJsonAsync("api/Authors", new AuthorData(authorData.Id, authorData.Name));
+                authorData.Id = (await response.Content.ReadAsAsync<Int32>());
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
         }
-        public Task<Boolean> UpdateAuthorAsync(AuthorData authorData)
+        public async Task<Boolean> UpdateAuthorAsync(AuthorData authorData)
         {
-            throw new NotImplementedException();
-        }
-        public Task<Boolean> RemoveAuthorAsync(AuthorData authorData)
-        {
-            throw new NotImplementedException();
+            try
+            {
+                HttpResponseMessage response = await _client.PutAsJsonAsync("api/Authors", new AuthorData(authorData.Id, authorData.Name));
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
         }
 
         public async Task<IEnumerable<CoverData>> ReadCoversAsync()
@@ -183,13 +212,30 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
                 throw new PersistenceUnavailableException(exception);
             }
         }
-        public Task<Boolean> AddCoverAsync(CoverData coverData)
+        public async Task<Boolean> CreateCoverAsync(CoverData coverData)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpResponseMessage response = await _client.PostAsJsonAsync("api/Covers", new CoverData(coverData.Id, coverData.Image));
+                coverData.Id = (await response.Content.ReadAsAsync<Int32>());
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
         }
-        public Task<Boolean> DeleteCoverAsync(CoverData coverData)
+        public async Task<Boolean> DeleteCoverAsync(CoverData coverData)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpResponseMessage response = await _client.DeleteAsync("api/Covers/" + coverData.Id);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
         }
 
         public async Task<IEnumerable<VolumeData>> ReadVolumesAsync()
@@ -211,21 +257,42 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
                 throw new PersistenceUnavailableException(exception);
             }
         }
-        public Task<Boolean> AddVolumeAsync(VolumeData volumeData)
+        public async Task<Boolean> CreateVolumeAsync(VolumeData volumeData)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpResponseMessage response = await _client.PostAsJsonAsync("api/Volumes", new VolumeData(volumeData.Id, volumeData.IsSortedOut, new BookData(volumeData.BookData.Id)));
+                volumeData.Id = (await response.Content.ReadAsAsync<String>());
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
         }
-        public Task<Boolean> UpdateVolumeAsync(VolumeData volumeData)
+        public async Task<Boolean> UpdateVolumeAsync(VolumeData volumeData)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpResponseMessage response = await _client.PutAsJsonAsync("api/Volumes", new VolumeData(volumeData.Id, volumeData.IsSortedOut, new BookData(volumeData.BookData.Id)));
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
         }
-        public Task<Boolean> RemoveVolumeAsync(VolumeData volumeData)
+        public async Task<Boolean> DeleteVolumeAsync(VolumeData volumeData)
         {
-            throw new NotImplementedException();
-        }
-        public Task<Boolean> SortOutVolumeAsync(VolumeData volumeData)
-        {
-            throw new NotImplementedException();
+            try
+            {
+                HttpResponseMessage response = await _client.DeleteAsync("api/Volumes/" + volumeData.Id);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
         }
 
         public async Task<IEnumerable<LendingData>> ReadLendingsAsync()
@@ -247,20 +314,29 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
                 throw new PersistenceUnavailableException(exception);
             }
         }
-
-        public Task<bool> AddLendingAsync(LendingData volumeData)
+        public async Task<Boolean> UpdateLendingAsync(LendingData lendingData)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpResponseMessage response = await _client.PutAsJsonAsync("api/Lendings", new LendingData(lendingData.Id, lendingData.UserName, lendingData.StartDate, lendingData.EndDate, lendingData.Active, new VolumeData(lendingData.VolumeData.Id)));
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
         }
-
-        public Task<bool> UpdateLendingAsync(LendingData volumeData)
+        public async Task<Boolean> DeleteLendingAsync(LendingData lendingData)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> RemoveLendingAsync(LendingData volumeData)
-        {
-            throw new NotImplementedException();
+            try
+            {
+                HttpResponseMessage response = await _client.DeleteAsync("api/Lendings/" + lendingData.Id);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception exception)
+            {
+                throw new PersistenceUnavailableException(exception);
+            }
         }
     }
 }

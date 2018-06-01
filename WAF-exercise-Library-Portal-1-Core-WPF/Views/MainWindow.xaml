@@ -4,38 +4,26 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
-        xmlns:viewModel="clr-namespace:WAF_exercise_Library_Portal_1_Core_WPF.ViewModels.Converters"
+        xmlns:converters="clr-namespace:WAF_exercise_Library_Portal_1_Core_WPF.ViewModels.Converters"
         mc:Ignorable="d"
-        Title="MainWindow" Height="850" Width="1100">
+        Title="MainWindow" Height="850" Width="815">
     <Window.Resources>
         <!-- erőforrások -->
-        <x:Array Type="system:String" x:Key="shoreTypeArray">
-            <system:String>homokos</system:String>
-            <system:String>sziklás</system:String>
-            <system:String>kavicsos</system:String>
-            <system:String>aprókavicsos</system:String>
-        </x:Array>
-        <viewModel:BookImageConverter x:Key="bookImageConverter"/>
-        <viewModel:AuthorCollectionConverter x:Key="authorCollectionConverter"/>
-        <viewModel:VolumeCollectionConverter x:Key="volumeCollectionConverter"/>
-        
+        <x:Array Type="system:String" x:Key="activeTypeArray">
+            <system:String>not picked up</system:String>
+            <system:String>picked up</system:String>
+            <system:String>returned</system:String>
+        </x:Array> 
+        <converters:BookImageConverter x:Key="bookImageConverter"/>
+        <converters:ActiveTypeConverter x:Key="activeTypeConverter"/>
     </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="35" />
-            <RowDefinition Height="250" />
-            <RowDefinition Height="35" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="35" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="600" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        
-        <Menu Grid.Row="0" Grid.ColumnSpan="2">
+        <Menu Grid.Row="0">
             <MenuItem Header="Database">
                 <MenuItem Header="Load data (server -> client)" Command="{Binding LoadCommand}" Tag="almafa"/>
                 <MenuItem Header="Save data (client -> server)" Command="{Binding SaveCommand}" IsEnabled="{Binding IsLoaded}"/>
@@ -43,71 +31,107 @@
                 <MenuItem Header="Kilépés" Command="{Binding ExitCommand}" />
             </MenuItem>
         </Menu>
+        <TabControl Grid.Row="1">
+            <TabItem Header="Books">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="250" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="35" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="368"/>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-        <DataGrid Name="bookDataGrid" Grid.Row="1" Grid.ColumnSpan="2" AutoGenerateColumns="false" IsReadOnly="True" ItemsSource="{Binding BookDatas}" SelectedItem="{Binding SelectedBookData}" SelectionMode="Single">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Binding="{Binding Id}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Title" Binding="{Binding Title}"></DataGridTextColumn>
-                <DataGridTextColumn Header="PublishedYear" Binding="{Binding PublishedYear}"></DataGridTextColumn>
-                <DataGridTextColumn Header="ISBN" Binding="{Binding Isbn}"></DataGridTextColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+                    <DataGrid Name="bookDatasGrid" Grid.Row="0" Grid.ColumnSpan="2" AutoGenerateColumns="false" IsReadOnly="True" ItemsSource="{Binding BookDatas}" SelectedItem="{Binding SelectedBookData}" SelectionMode="Single" SelectionUnit="FullRow">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="auto" Header="Id" Binding="{Binding Id}"></DataGridTextColumn>
+                            <DataGridTextColumn Width="auto" Header="Title" Binding="{Binding Title}"></DataGridTextColumn>
+                            <DataGridTextColumn Width="auto" Header="PublishedYear" Binding="{Binding PublishedYear}"></DataGridTextColumn>
+                            <DataGridTextColumn Width="*" Header="ISBN" Binding="{Binding Isbn}"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <Button Content="Create" Margin="6,5,0,5" Command="{Binding CreateBookCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
-            <Button Content="Edit" Margin="6,5,0,5" Command="{Binding UpdateBookCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
-            <Button Content="Delete" Margin="6,5,6,5" Command="{Binding DeleteBookCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
-        </StackPanel>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Grid.ColumnSpan="2">
+                        <Button Content="Create" Margin="6,5,0,5" Command="{Binding CreateBookCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                        <Button Content="Edit" Margin="6,5,0,5" Command="{Binding UpdateBookCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                        <Button Content="Delete" Margin="6,5,6,5" Command="{Binding DeleteBookCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                    </StackPanel>
 
-        <DataGrid Name="authorDataGrid" Grid.Row="3" Grid.Column="0" AutoGenerateColumns="false" IsReadOnly="True" ItemsSource="{Binding ElementName=bookDataGrid, Path=SelectedItem.AuthorDatas}" SelectedItem="{Binding SelectedAuthorData}" SelectionMode="Single">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Binding="{Binding Id}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}"></DataGridTextColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+                    <DataGrid Name="authorDatasGrid" Grid.Row="2" Grid.Column="0" AutoGenerateColumns="false" IsReadOnly="True" ItemsSource="{Binding ElementName=bookDatasGrid, Path=SelectedItem.AuthorDatas}" SelectedItem="{Binding SelectedAuthorData}" SelectionMode="Single" SelectionUnit="FullRow">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="auto" Header="Id" Binding="{Binding Id}"></DataGridTextColumn>
+                            <DataGridTextColumn Width="*" Header="Name" Binding="{Binding Name}"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
 
-        <Image Name="bookCoverImage" Grid.Row="3" Grid.Column="1" Height="250" Width="auto" Source="{Binding ElementName=bookDataGrid, Path=SelectedItem.Cover.Image}" />
+                    <Image Name="coverDataImage" Grid.Row="2" Grid.Column="1" Height="250" Width="auto" Source="{Binding ElementName=bookDatasGrid, Path=SelectedItem.Cover.Image}" />
 
-        <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal">
-            <Button Content="Create" Margin="6,5,0,5" Command="{Binding CreateAuthorCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
-            <Button Content="Edit" Margin="6,5,0,5" Command="{Binding UpdateAuthorCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
-            <Button Content="Remove" Margin="6,5,0,5" Command="{Binding RemoveAuthorCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                    <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal">
+                        <Button Content="Create" Margin="6,5,0,5" Command="{Binding CreateAuthorCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                        <Button Content="Edit" Margin="6,5,0,5" Command="{Binding UpdateAuthorCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                        <Button Content="Remove" Margin="6,5,0,5" Command="{Binding RemoveAuthorCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                    </StackPanel>
 
-            <Button Content="Add" Margin="6,5,0,5" Command="{Binding AddAuthorCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
-            <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding AuthorDatas}" SelectedItem="{Binding SelectedAddingAuthorData}" IsEnabled="{Binding IsLoaded}" Width="100" HorizontalAlignment="Right">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Path=Name}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </StackPanel>
+                    <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal">
+                        <Button Content="Add" Margin="6,5,0,5" Command="{Binding AddAuthorCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding AuthorDatas}" SelectedItem="{Binding SelectedAddingAuthorData}" IsEnabled="{Binding IsLoaded}" Width="114" HorizontalAlignment="Right">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=Name}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
 
-        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Create" Margin="6,5,0,5" Command="{Binding CreateCoverCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
-            <Button Content="Remove" Margin="6,5,0,5" Command="{Binding RemoveCoverCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                    <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Create" Margin="0,5,0,5" Command="{Binding CreateCoverCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                        <Button Content="Remove" Margin="5,5,5,5" Command="{Binding RemoveCoverCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                    </StackPanel>
+                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Add" Margin="0,5,0,5" Command="{Binding AddCoverCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                        <ComboBox Grid.Row="1" Grid.Column="1" Margin="6,5,5,5" ItemsSource="{Binding CoverIds}" SelectedItem="{Binding SelectedAddingCoverDataId}" IsEnabled="{Binding IsLoaded}" Width="114" HorizontalAlignment="Right"/>
+                    </StackPanel>
 
-            <Button Content="Add" Margin="6,5,0,5" Command="{Binding AddCoverCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
-            <ComboBox Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding CoverDatas}" SelectedItem="{Binding SelectedAddingCoverData}" IsEnabled="{Binding IsLoaded}" Width="100" HorizontalAlignment="Right">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Path=Id}" />
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-        </StackPanel>
+                    <DataGrid Name="volumeDatasGrid" Grid.Row="5" Grid.ColumnSpan="2" AutoGenerateColumns="false" IsReadOnly="True" ItemsSource="{Binding ElementName=bookDatasGrid, Path=SelectedItem.VolumeDatas}" SelectedItem="{Binding SelectedVolumeData}" SelectionMode="Single" SelectionUnit="FullRow">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="auto" Header="Id" Binding="{Binding Id}"></DataGridTextColumn>
+                            <DataGridTextColumn Width="*" Header="Is Sorted Out" Binding="{Binding IsSortedOut}"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
 
-        <DataGrid Name="volumeDataGrid" Grid.Row="5" Grid.ColumnSpan="2" AutoGenerateColumns="false" IsReadOnly="True" ItemsSource="{Binding ElementName=bookDataGrid, Path=SelectedItem.VolumeDatas}" SelectedItem="{Binding SelectedVolumeData}" SelectionMode="Single">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Id" Binding="{Binding Id}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Is Sorted Out" Binding="{Binding IsSortedOut}"></DataGridTextColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+                    <StackPanel Grid.Row="6" Grid.ColumnSpan="2" Orientation="Horizontal">
+                        <Button Content="Create" Margin="6,5,0,5" Command="{Binding CreateVolumeCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                        <Button Content="Sort out" Margin="6,5,0,5" Command="{Binding SortOutVolumeCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                        <Button Content="Delete" Margin="6,5,6,5" Command="{Binding DeleteVolumeCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Lendings">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="35" />
+                    </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="6" Grid.ColumnSpan="2" Orientation="Horizontal">
-            <Button Content="Create" Margin="6,5,0,5" Command="{Binding CreateVolumeCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
-            <Button Content="Edit" Margin="6,5,0,5" Command="{Binding UpdateVolumeCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
-            <Button Content="Delete" Margin="6,5,6,5" Command="{Binding DeleteVolumeCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
-        </StackPanel>
+                    <DataGrid Name="relevantLendingDatasGrid" Grid.Row="0" AutoGenerateColumns="false" IsReadOnly="True" ItemsSource="{Binding RelevantLendingDatas}" SelectedItem="{Binding SelectedRelevantLendingData}" SelectionMode="Single" SelectionUnit="FullRow">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="auto" Header="Id" Binding="{Binding Id}"></DataGridTextColumn>
+                            <DataGridTextColumn Width="auto" Header="User name" Binding="{Binding UserName}"></DataGridTextColumn>
+                            <DataGridTextColumn Width="auto" Header="User name" Binding="{Binding Active, Converter={StaticResource activeTypeConverter}, ConverterParameter={StaticResource activeTypeArray}}"></DataGridTextColumn>
+                            <DataGridTextColumn Width="auto" Header="Start date" Binding="{Binding StartDate, StringFormat='{}{0:yyyy.MM.dd hh:mm:ss}'}"></DataGridTextColumn>
+                            <DataGridTextColumn Width="auto" Header="End date" Binding="{Binding EndDate, StringFormat='{}{0:yyyy.MM.dd hh:mm:ss}'}"></DataGridTextColumn>
+                            <DataGridTextColumn Width="*" Header="Volume" Binding="{Binding VolumeData.Id}"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button HorizontalAlignment="Left" Grid.Row="1" Content="Turn" Margin="6,5,0,5" Command="{Binding TurnLendingCommand}" Width="114" IsEnabled="{Binding IsLoaded}" />
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

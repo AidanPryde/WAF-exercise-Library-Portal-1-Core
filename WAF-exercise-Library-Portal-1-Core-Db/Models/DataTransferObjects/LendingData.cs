@@ -9,7 +9,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public Boolean Active { get; set; }
+        public Byte Active { get; set; }
 
         public VolumeData VolumeData { get; set; }
 
@@ -18,7 +18,7 @@ namespace WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects
             Id = -1;
         }
 
-        public LendingData(Int32 id, String userName, DateTime startDate, DateTime endDate, Boolean active, VolumeData volumeData)
+        public LendingData(Int32 id, String userName, DateTime startDate, DateTime endDate, Byte active, VolumeData volumeData)
         {
             Id = id;
             UserName = userName;

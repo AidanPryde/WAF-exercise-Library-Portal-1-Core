@@ -6,6 +6,10 @@
         xmlns:local="clr-namespace:WAF_exercise_Library_Portal_1_Core_WPF.Views"
         mc:Ignorable="d"
         Title="BookWindow" Height="160" Width="270" WindowStyle="ToolWindow">
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding SaveCommand}" Key="Return"/>
+    </Window.InputBindings>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />

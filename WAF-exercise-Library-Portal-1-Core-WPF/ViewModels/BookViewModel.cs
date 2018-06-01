@@ -11,7 +11,19 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
     {
         private ILibraryModel _model;
 
-        public BookData EditedBookData { get; private set; }
+        private BookData _editedBookData;
+        public BookData EditedBookData
+        {
+            get { return _editedBookData; }
+            set
+            {
+                if (_editedBookData != value)
+                {
+                    _editedBookData = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public DelegateCommand SaveCommand { get; private set; }
         public DelegateCommand CancelCommand { get; private set; }
@@ -21,7 +33,14 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         public BookViewModel(ILibraryModel model, BookData bookData)
         {
             _model = model ?? throw new ArgumentNullException(nameof(model));
-            EditedBookData = bookData;
+            _editedBookData = bookData;
+
+            if (_editedBookData.Id == -1)
+            {
+                _editedBookData.Isbn = 123456789;
+                _editedBookData.Title = "TestTitle";
+                _editedBookData.PublishedYear = 2000;
+            }
 
             SaveCommand = new DelegateCommand((param) => Save());
             CancelCommand = new DelegateCommand((param) => Cancel());

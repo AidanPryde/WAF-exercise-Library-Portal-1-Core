@@ -42,29 +42,56 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
             }
         }
 
-        // GET: api/Covers/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-        
         // POST: api/Covers
+        [Authorize(Roles = "admin")]
         [HttpPost]
-        public void Post([FromBody]string value)
+        public IActionResult Post([FromBody] CoverData coverData)
         {
+            try
+            {
+                var addedCover = _context.Cover.Add(new Cover
+                {
+                    Image = coverData.Image
+                });
+
+                _context.SaveChanges();
+
+                coverData.Id = addedCover.Entity.Id;
+
+                return Ok(coverData.Id);
+
+            }
+            catch
+            {
+                // Internal Server Error
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
-        
-        // PUT: api/Covers/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-        
+
         // DELETE: api/ApiWithActions/5
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(Int32 id)
         {
+            try
+            {
+                Cover cover = _context.Cover.FirstOrDefault(c => c.Id == id);
+
+                if (cover == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Cover.Remove(cover);
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            catch
+            {
+                // Internal Server Error
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

@@ -59,7 +59,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 
             try
             {
-                Boolean result = await _model.LoginAsync("admin", "Almafa123");
+                Boolean result = await _model.LoginAsAdminAsync("admin", "Almafa123");
                 //Boolean result = await _model.LoginAsync(UserName, passwordBox.Password);
 
                 if (result)
@@ -83,6 +83,8 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
                 }
 
                 OnMessageApplication($"Unexpected error occurred!{Environment.NewLine}{msg}");
+
+                OnLoginFailed();
             }
 
             IsReady = true;

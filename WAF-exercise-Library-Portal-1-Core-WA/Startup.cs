@@ -60,7 +60,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -87,7 +87,9 @@ namespace WAF_exercise_Library_Portal_1_Core_WA
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            DbInitializer.Initialize(app.ApplicationServices.GetRequiredService<LibraryDbContext>(),
+            DbInitializer.Initialize(serviceProvider.GetRequiredService<LibraryDbContext>(),
+                serviceProvider.GetRequiredService<UserManager<ApplicationUser>>(),
+                serviceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>(),
                 "..\\Data\\Images\\Covers");
         }
     }

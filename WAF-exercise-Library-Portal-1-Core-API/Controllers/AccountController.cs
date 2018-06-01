@@ -16,15 +16,17 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
     public class AccountController : Controller
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AccountController(SignInManager<ApplicationUser> signInManager)
+        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager;
+            _userManager = userManager;
         }
 
-        // api/Account/Login
+        // api/Account/LoginAsAdmin
         [HttpPost("[action]")]
-        public async Task<IActionResult> Login([FromBody] LoginData user)
+        public async Task<IActionResult> LoginAsAdmin([FromBody] LoginData user)
         {
             try
             {
@@ -39,7 +41,13 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
 
                     if (result.Succeeded)
                     {
-                        return Ok();
+                        ApplicationUser applicationUser = await _userManager.FindByNameAsync(user.UserName);
+                        Boolean isAdmin = await _userManager.IsInRoleAsync(applicationUser, "admin");
+
+                        if (isAdmin)
+                        {
+                            return Ok();
+                        }
                     }
 
                     ModelState.AddModelError("", "Login failed!");
@@ -55,8 +63,8 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
         }
 
         // api/Account/Logout
-        [HttpGet("[action]")]
         [Authorize]
+        [HttpGet("[action]")]
         public async Task<IActionResult> Logout()
         {
             try

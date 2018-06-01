@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -14,24 +15,6 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
 
         private static UserManager<ApplicationUser> _userManager;
         private static RoleManager<IdentityRole<int>> _roleManager;
-
-        public static void Initialize(LibraryDbContext context,
-            String coverImageDirectory)
-        {
-            _context = context;
-            _context.Database.EnsureCreated();
-
-            if (context.Book.Any())
-            {
-                return;
-            }
-
-            SeedAuthor();
-            SeedCover(coverImageDirectory);
-            SeedBook();
-            SeedVolume();
-            SeedBookAuthor();
-        }
 
         public static void Initialize(LibraryDbContext context,
             UserManager<ApplicationUser> userManager,
@@ -51,11 +34,10 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
                 SeedBook();
                 SeedVolume();
                 SeedBookAuthor();
-            }
 
-            if (_context.Users.Any() == false)
-            {
-                SeedApplicationUsers();
+                SeedApplicationUser();
+
+                SeedLending();
             }
         }
 
@@ -199,20 +181,116 @@ namespace WAF_exercise_Library_Portal_1_Core_Db
             _context.SaveChanges();
         }
 
-        private static void SeedApplicationUsers()
+        private static void SeedApplicationUser()
         {
+            var adminRole = new IdentityRole<int>("admin");
+            CheckErrors(_roleManager.CreateAsync(adminRole).Result);
+
+            var userRole = new IdentityRole<int>("user");
+            CheckErrors(_roleManager.CreateAsync(userRole).Result);
+
             var adminUser = new ApplicationUser()
             {
                 UserName = "admin",
                 Name = "Admin",
                 Email = "admin@example.com",
             };
-            var adminPassword = "Almafa123";
-            var adminRole = new IdentityRole<int>("admin");
-
-            CheckErrors(_userManager.CreateAsync(adminUser, adminPassword).Result);
-            CheckErrors(_roleManager.CreateAsync(adminRole).Result);
+            var adminUserPassword = "Almafa123";
+            CheckErrors(_userManager.CreateAsync(adminUser, adminUserPassword).Result);
             CheckErrors(_userManager.AddToRoleAsync(adminUser, adminRole.Name).Result);
+
+            var testUser1 = new ApplicationUser()
+            {
+                UserName = "test1",
+                Name = "Test 1",
+                Email = "test1@example.com",
+            };
+            var testUser1Password = "Almafa123";
+            CheckErrors(_userManager.CreateAsync(testUser1, testUser1Password).Result);
+            CheckErrors(_userManager.AddToRoleAsync(testUser1, userRole.Name).Result);
+
+            var testUser2 = new ApplicationUser()
+            {
+                UserName = "test2",
+                Name = "Test 2",
+                Email = "test2@example.com",
+            };
+            var testUser2Password = "Almafa123";
+            CheckErrors(_userManager.CreateAsync(testUser2, testUser2Password).Result);
+            CheckErrors(_userManager.AddToRoleAsync(testUser2, userRole.Name).Result);
+        }
+
+        private static void SeedLending()
+        {
+            Random random = new Random(Guid.NewGuid().GetHashCode());
+
+            Int32 min = 2;
+            Int32 max = 3;
+
+            List<Volume> volumes = _context.Volume.Where(v => v.IsSordtedOut == false).ToList();
+
+            if (volumes.Count < 7)
+            {
+                throw new Exception("Not enougth not sorted out volume seed ...");
+            }
+
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-7), EndDate = DateTime.UtcNow.AddDays(-6), VolumeId = volumes.ElementAt(0).Id });
+            _context.Lending.Add(new Lending() { Active = 1, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-5), EndDate = DateTime.UtcNow.AddDays(-4), VolumeId = volumes.ElementAt(0).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-3), EndDate = DateTime.UtcNow.AddDays(-2), VolumeId = volumes.ElementAt(0).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-1), EndDate = DateTime.UtcNow.AddDays(1), VolumeId = volumes.ElementAt(0).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(2), EndDate = DateTime.UtcNow.AddDays(3), VolumeId = volumes.ElementAt(0).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(4), EndDate = DateTime.UtcNow.AddDays(5), VolumeId = volumes.ElementAt(0).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(6), EndDate = DateTime.UtcNow.AddDays(7), VolumeId = volumes.ElementAt(0).Id });
+
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-7), EndDate = DateTime.UtcNow.AddDays(-6), VolumeId = volumes.ElementAt(1).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-5), EndDate = DateTime.UtcNow.AddDays(-4), VolumeId = volumes.ElementAt(1).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-3), EndDate = DateTime.UtcNow.AddDays(-2), VolumeId = volumes.ElementAt(1).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-1), EndDate = DateTime.UtcNow.AddDays(1), VolumeId = volumes.ElementAt(1).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(2), EndDate = DateTime.UtcNow.AddDays(3), VolumeId = volumes.ElementAt(1).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(4), EndDate = DateTime.UtcNow.AddDays(5), VolumeId = volumes.ElementAt(1).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(6), EndDate = DateTime.UtcNow.AddDays(7), VolumeId = volumes.ElementAt(1).Id });
+
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-7), EndDate = DateTime.UtcNow.AddDays(-6), VolumeId = volumes.ElementAt(2).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-5), EndDate = DateTime.UtcNow.AddDays(-4), VolumeId = volumes.ElementAt(2).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-3), EndDate = DateTime.UtcNow.AddDays(-2), VolumeId = volumes.ElementAt(2).Id });
+            _context.Lending.Add(new Lending() { Active = 1, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-1), EndDate = DateTime.UtcNow.AddDays(1), VolumeId = volumes.ElementAt(2).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(2), EndDate = DateTime.UtcNow.AddDays(3), VolumeId = volumes.ElementAt(2).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(4), EndDate = DateTime.UtcNow.AddDays(5), VolumeId = volumes.ElementAt(2).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(6), EndDate = DateTime.UtcNow.AddDays(7), VolumeId = volumes.ElementAt(2).Id });
+
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-7), EndDate = DateTime.UtcNow.AddDays(-6), VolumeId = volumes.ElementAt(3).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-5), EndDate = DateTime.UtcNow.AddDays(-4), VolumeId = volumes.ElementAt(3).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-3), EndDate = DateTime.UtcNow.AddDays(-2), VolumeId = volumes.ElementAt(3).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-1), EndDate = DateTime.UtcNow.AddDays(1), VolumeId = volumes.ElementAt(3).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(2), EndDate = DateTime.UtcNow.AddDays(3), VolumeId = volumes.ElementAt(3).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(4), EndDate = DateTime.UtcNow.AddDays(5), VolumeId = volumes.ElementAt(3).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(6), EndDate = DateTime.UtcNow.AddDays(7), VolumeId = volumes.ElementAt(3).Id });
+
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-7), EndDate = DateTime.UtcNow.AddDays(-6), VolumeId = volumes.ElementAt(4).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-5), EndDate = DateTime.UtcNow.AddDays(-4), VolumeId = volumes.ElementAt(4).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-3), EndDate = DateTime.UtcNow.AddDays(-2), VolumeId = volumes.ElementAt(4).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-1), EndDate = DateTime.UtcNow.AddDays(1), VolumeId = volumes.ElementAt(4).Id });
+            _context.Lending.Add(new Lending() { Active = 1, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(2), EndDate = DateTime.UtcNow.AddDays(3), VolumeId = volumes.ElementAt(4).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(4), EndDate = DateTime.UtcNow.AddDays(5), VolumeId = volumes.ElementAt(4).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(6), EndDate = DateTime.UtcNow.AddDays(7), VolumeId = volumes.ElementAt(4).Id });
+
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-7), EndDate = DateTime.UtcNow.AddDays(-6), VolumeId = volumes.ElementAt(5).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-5), EndDate = DateTime.UtcNow.AddDays(-4), VolumeId = volumes.ElementAt(5).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-3), EndDate = DateTime.UtcNow.AddDays(-2), VolumeId = volumes.ElementAt(5).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-1), EndDate = DateTime.UtcNow.AddDays(1), VolumeId = volumes.ElementAt(5).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(2), EndDate = DateTime.UtcNow.AddDays(3), VolumeId = volumes.ElementAt(5).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(4), EndDate = DateTime.UtcNow.AddDays(5), VolumeId = volumes.ElementAt(5).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(6), EndDate = DateTime.UtcNow.AddDays(7), VolumeId = volumes.ElementAt(5).Id });
+
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-7), EndDate = DateTime.UtcNow.AddDays(-6), VolumeId = volumes.ElementAt(6).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-5), EndDate = DateTime.UtcNow.AddDays(-4), VolumeId = volumes.ElementAt(6).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-3), EndDate = DateTime.UtcNow.AddDays(-2), VolumeId = volumes.ElementAt(6).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(-1), EndDate = DateTime.UtcNow.AddDays(1), VolumeId = volumes.ElementAt(6).Id });
+            _context.Lending.Add(new Lending() { Active = 2, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(2), EndDate = DateTime.UtcNow.AddDays(3), VolumeId = volumes.ElementAt(6).Id });
+            _context.Lending.Add(new Lending() { Active = 1, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(4), EndDate = DateTime.UtcNow.AddDays(5), VolumeId = volumes.ElementAt(6).Id });
+            _context.Lending.Add(new Lending() { Active = 0, ApplicationUserId = random.Next(min, max), StartDate = DateTime.UtcNow.AddDays(6), EndDate = DateTime.UtcNow.AddDays(7), VolumeId = volumes.ElementAt(6).Id });
+
+            _context.SaveChanges();
         }
 
         private static void CheckErrors(IdentityResult result)

@@ -45,32 +45,6 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
-        // GET: api/Books/5
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
-        {
-            try
-            {
-                return Ok(_context
-                        .Book
-                        .Where(b => b.Id == id)
-                        .ToList()
-                        .Select(b => new BookData(b.Id,
-                            b.Title,
-                            b.PublishedYear,
-                            b.Isbn,
-                            new CoverData(b.Id,
-                                b.Cover?.Image) 
-                        ))
-                        .Single());
-            }
-            catch
-            {
-                // Internal Server Error
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
         
         // POST: api/Books
         [HttpPost]
@@ -84,6 +58,7 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                     Title = bookData.Title,
                     PublishedYear = bookData.PublishedYear,
                     Isbn = bookData.Isbn,
+                    CoverId = bookData.Cover?.Id
                 });
 
                 _context.SaveChanges();
@@ -107,7 +82,7 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
         {
             try
             {
-                Book book = _context.Book.FirstOrDefault(b => b.Equals(bookData));
+                Book book = _context.Book.FirstOrDefault(b => b.Id == bookData.Id);
 
                 if (book == null)
                 {
@@ -117,6 +92,7 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                 book.Title = bookData.Title;
                 book.PublishedYear = bookData.PublishedYear;
                 book.Isbn = bookData.Isbn;
+                book.CoverId = bookData.Cover?.Id;
 
                 _context.SaveChanges();
 
@@ -144,7 +120,6 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                 }
 
                 _context.Book.Remove(book);
-
                 _context.SaveChanges();
 
                 return Ok();

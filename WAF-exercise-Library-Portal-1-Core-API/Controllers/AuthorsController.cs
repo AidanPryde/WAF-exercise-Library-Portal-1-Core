@@ -3,9 +3,11 @@ using System.Linq;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 using WAF_exercise_Library_Portal_1_Core_Db;
+using WAF_exercise_Library_Portal_1_Core_Db.Models;
 using WAF_exercise_Library_Portal_1_Core_Db.Models.DataTransferObjects;
 
 namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
@@ -51,10 +53,11 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                     .Author
                     .Where(a => a.Id == id)
                     .Select(a => new AuthorData
-                {
-                    Id = a.Id,
-                    Name = a.Name
-                }).Single());
+                    {
+                        Id = a.Id,
+                        Name = a.Name
+                    })
+                    .Single());
             }
             catch
             {
@@ -62,26 +65,61 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-        
+
         // POST: api/Authors
+        [Authorize(Roles = "admin")]
         [HttpPost]
-        public void Post([FromBody]string value)
+        public IActionResult Post([FromBody] AuthorData authorData)
         {
-        }
-        
-        // PUT: api/Authors/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
+            try
+            {
+                var addedAuthor = _context.Author.Add(new Author
+                {
+                   Name = authorData.Name
+                });
+
+                _context.SaveChanges();
+
+                authorData.Id = addedAuthor.Entity.Id;
+
+                return Ok(authorData.Id);
+            }
+            catch
+            {
+                // Internal Server Error
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
-        // DELETE: api/Authors/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // PUT: api/Authors/5
+        [Authorize(Roles = "admin")]
+        [HttpPut]
+        public IActionResult Put([FromBody] AuthorData authorData)
         {
+            try
+            {
+                Author author = _context.Author.FirstOrDefault(a => a.Id == authorData.Id);
+
+                if (author == null)
+                {
+                    return NotFound();
+                }
+
+                author.Name = authorData.Name;
+
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            catch
+            {
+                // Internal Server Error
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
-        
+
         // GET: api/Authors/BookId/5
+        [Authorize(Roles = "admin")]
         [HttpGet("BookId/{id}")]
         public IActionResult GetWhereBookId(Int32 id)
         {

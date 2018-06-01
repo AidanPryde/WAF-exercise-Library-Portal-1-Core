@@ -27,7 +27,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                         .ThenInclude(l => l.ApplicationUser);
             }
         }
-
         public IEnumerable<Book> BooksWithAuthorsVolumesLendings
         {
             get
@@ -39,7 +38,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                         .ThenInclude(v => v.Lendings);
             }
         }
-
         public IEnumerable<Book> BooksWithAuthors
         {
             get
@@ -47,7 +45,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                 return _context.Book.Include(b => b.BookAuthors).ThenInclude(ba => ba.Author);
             }
         }
-
         private IEnumerable<Volume> Volumes
         {
             get
@@ -66,27 +63,37 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
             try
             {
                 if (bookId == null)
+                {
                     return null;
+                }
 
                 Book book = _context.Book.FirstOrDefault(b => bookId == b.Id);
 
                 if (book == null)
+                {
                     return null;
+                }
 
                 Int32? coderId = book.CoverId;
 
                 if (coderId == null)
+                {
                     return null;
+                }
 
                 Cover cover = _context.Cover.FirstOrDefault(c => coderId == c.Id);
 
                 if (cover == null)
+                {
                     return null;
+                }
 
                 Byte[] imageContent = cover.Image;
 
                 if (imageContent == null)
+                {
                     return null;
+                }
 
                 return imageContent;
             }
@@ -132,7 +139,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                 return null;
             }
         }
-
         public IEnumerable<Book> NarrowBooksSelection(IEnumerable<Book> books, Int32 from, Int32 pagingSzie = 20)
         {
             try
@@ -163,7 +169,9 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
             {
                 Volume volume = GetVolumeByVolumeId(id);
                 if (volume == null)
+                {
                     return null;
+                }
 
                 return volume.BookId;
             }
@@ -172,7 +180,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                 return null;
             }
         }
-
         public async Task<Int32?> GetBookIdByLendingId(Int32 id)
         {
             try
@@ -180,7 +187,9 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                 Lending lending = await _context.Lending.Where(l => l.Id == id).Include(l => l.Volume).FirstOrDefaultAsync();
 
                 if (lending == null)
+                {
                     return null;
+                }
 
                 return lending.Volume.BookId;
             }
@@ -218,8 +227,9 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                 Volume volume = await _context.Volume.Where(v => v.Id == lending.VolumeId).Include(v => v.Lendings).FirstOrDefaultAsync();
 
                 if (volume == null)
+                {
                     return UpdateResult.DbError;
-
+                }
 
                 if (lending.StartDate < DateTime.UtcNow
                  || lending.EndDate < DateTime.UtcNow
@@ -245,7 +255,9 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                 await _context.Lending.AddAsync(lending);
 
                 if (await _context.SaveChangesAsync() > 0)
+                {
                     return UpdateResult.Success;
+                }
 
                 return UpdateResult.DbError;
             }
@@ -255,7 +267,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
             }
             
         }
-
         public async Task<UpdateResult> RemoveLending(Int32 lendingId, Int32 applicationUserId)
         {
             try
@@ -263,12 +274,16 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Services
                 Lending lending = await _context.Lending.FirstOrDefaultAsync(l => l.Id == lendingId && l.ApplicationUserId == applicationUserId);
 
                 if (lending == null)
+                {
                     return UpdateResult.DbError;
+                }
 
                 _context.Lending.Remove(lending);
 
                 if (await _context.SaveChangesAsync() > 0)
+                {
                     return UpdateResult.Success;
+                }
 
                 return UpdateResult.DbError;
             }

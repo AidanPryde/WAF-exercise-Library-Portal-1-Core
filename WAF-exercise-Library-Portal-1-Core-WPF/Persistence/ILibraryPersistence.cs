@@ -14,30 +14,27 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
         Task<Boolean> DeleteBookAsync(BookData bookData);
 
         Task<IEnumerable<BookAuthorData>> ReadBookAuthorsAsync();
-        Task<Boolean> AddBookAuthorAsync(BookAuthorData bookAuthorData);
-        Task<Boolean> RemoveBookAuthorAsync(BookAuthorData bookAuthorData);
+        Task<Boolean> CreateBookAuthorAsync(BookAuthorData bookAuthorData);
+        Task<Boolean> DeleteBookAuthorAsync(BookAuthorData bookAuthorData);
 
         Task<IEnumerable<AuthorData>> ReadAuthorsAsync();
-        Task<Boolean> AddAuthorAsync(AuthorData authorData);
+        Task<Boolean> CreateAuthorAsync(AuthorData authorData);
         Task<Boolean> UpdateAuthorAsync(AuthorData authorData);
-        Task<Boolean> RemoveAuthorAsync(AuthorData authorData);
 
         Task<IEnumerable<CoverData>> ReadCoversAsync();
-        Task<Boolean> AddCoverAsync(CoverData coverData);
+        Task<Boolean> CreateCoverAsync(CoverData coverData);
         Task<Boolean> DeleteCoverAsync(CoverData coverData);
 
         Task<IEnumerable<VolumeData>> ReadVolumesAsync();
-        Task<Boolean> AddVolumeAsync(VolumeData volumeData);
+        Task<Boolean> CreateVolumeAsync(VolumeData volumeData);
         Task<Boolean> UpdateVolumeAsync(VolumeData volumeData);
-        Task<Boolean> RemoveVolumeAsync(VolumeData volumeData);
-        Task<Boolean> SortOutVolumeAsync(VolumeData volumeData);
+        Task<Boolean> DeleteVolumeAsync(VolumeData volumeData);
 
         Task<IEnumerable<LendingData>> ReadLendingsAsync();
-        Task<Boolean> AddLendingAsync(LendingData volumeData);
         Task<Boolean> UpdateLendingAsync(LendingData volumeData);
-        Task<Boolean> RemoveLendingAsync(LendingData volumeData);
+        Task<Boolean> DeleteLendingAsync(LendingData volumeData);
 
-        Task<Boolean> LoginAsync(LoginData user);
+        Task<Boolean> LoginAsAdminAsync(LoginData user);
         Task<Boolean> LogoutAsync();
         
     }

@@ -34,8 +34,12 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         {
             _model = model ?? throw new ArgumentNullException(nameof(model));
             _bookId = bookId;
-
             _editedAuthorData = authorData;
+
+            if (_editedAuthorData.Id == -1)
+            {
+                _editedAuthorData.Name = "TestAuthor";
+            }
 
             SaveCommand = new DelegateCommand((param) => Save());
             CancelCommand = new DelegateCommand((param) => Cancel());

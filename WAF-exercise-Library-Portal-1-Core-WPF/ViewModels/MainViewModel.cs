@@ -123,6 +123,33 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             }
         }
 
+        private ObservableCollection<LendingData> _relevantLendingDatas;
+        public ObservableCollection<LendingData> RelevantLendingDatas
+        {
+            get { return _relevantLendingDatas; }
+            private set
+            {
+                if (_relevantLendingDatas != value)
+                {
+                    _relevantLendingDatas = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        private LendingData _selectedRelevantLendingData;
+        public LendingData SelectedRelevantLendingData
+        {
+            get { return _selectedRelevantLendingData; }
+            set
+            {
+                if (_selectedRelevantLendingData != value)
+                {
+                    _selectedRelevantLendingData = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private Boolean _isLoaded;
         public Boolean IsLoaded
         {
@@ -155,10 +182,10 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         public DelegateCommand RemoveCoverCommand { get; private set; }
 
         public DelegateCommand CreateVolumeCommand { get; private set; }
-        public DelegateCommand UpdateVolumeCommand { get; private set; }
+        public DelegateCommand SortOutVolumeCommand { get; private set; }
         public DelegateCommand DeleteVolumeCommand { get; private set; }
 
-        public event EventHandler<VolumeEditingEventArgs> VolumeEditingStarted;
+        public DelegateCommand TurnLendingCommand { get; private set; }
 
         public DelegateCommand ExitCommand { get; private set; }
 
@@ -171,12 +198,17 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         {
             _model = model ?? throw new ArgumentNullException(nameof(model));
 
-            _model.BookDatasChanged += Model_BookChanged;
-            _model.BookAuthorDatasChanged += Model_BookAuthorDatasChanged;
-            _model.AuthorDataAdded += Model_AuthorDatasChanged;
-            _model.CoverDataAdded += Model_CoverDatasChanged;
-            _model.LendingDataChanged += Model_LendingDatasChanged;
-            _model.VolumeDatasChanged += Model_VolumeDatasChanged;
+            _model.AuthorDataChanged += Model_AuthorDataChanged;
+            _model.BookAuthorDataCreated += Model_BookAuthorDataCreated;
+            _model.BookAuthorDataDeleted += Model_BookAuthorDataDeleted;
+            _model.BookDataChanged += Model_BookDataChanged;
+            _model.BookDataDeleted += Model_BookDataDeleted;
+            _model.CoverDataChanged += Model_CoverDataChanged;
+            _model.CoverDataRemoved += Model_CoverDataRemoved;
+            _model.LendingDataChanged += Model_LendingDataChanged;
+            _model.LendingDataDeleted += Model_LendingDataDeleted;
+            _model.VolumeDataChanged += Model_VolumeDataChanged;
+            _model.VolumeDataDeleted += Model_VolumeDataDeleted;
 
             _isLoaded = false;
 
@@ -194,8 +226,10 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             RemoveCoverCommand = new DelegateCommand((param) => RemoveCover());
 
             CreateVolumeCommand = new DelegateCommand(param => CreateVolume());
-            UpdateVolumeCommand = new DelegateCommand(param => UpdateVolume());
+            SortOutVolumeCommand = new DelegateCommand(param => SortOutVolume());
             DeleteVolumeCommand = new DelegateCommand(param => DeleteVolume());
+
+            TurnLendingCommand = new DelegateCommand(param => TurnLending());
 
             LoadCommand = new DelegateCommand(param => LoadAsync());
             SaveCommand = new DelegateCommand(param => SaveAsync());
@@ -244,9 +278,15 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         {
             BookEditingStarted?.Invoke(this, bookData);
         }
-        private void Model_BookChanged(Object sender, Int32 e)
+        private void Model_BookDataChanged(Object sender, BookData bookData)
         {
-            Int32 index = BookDatas.IndexOf(BookDatas.FirstOrDefault(b => b.Id == e));
+            if (bookData == null)
+            {
+                OnMessageApplication(String.Format("Failed to SYNC book."));
+                return;
+            }
+
+            Int32 index = BookDatas.IndexOf(BookDatas.FirstOrDefault(b => b.Equals(bookData)));
 
             if (index != -1)
             {
@@ -254,17 +294,27 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             }
             else
             {
-                index = e - 1;
+                index = BookDatas.IndexOf(BookDatas.Last());
             }
 
-            BookDatas.Insert(index, _model.BookDatas[index]);
-
+            BookDatas.Insert(index, bookData);
             SelectedBookData = BookDatas[index];
         }
-
-        private void Model_BookAuthorDatasChanged(Object sender, int e)
+        private void Model_BookDataDeleted(Object sender, BookData bookData)
         {
-            //throw new NotImplementedException();
+            Int32 index = BookDatas.IndexOf(BookDatas.FirstOrDefault(b => b.Equals(bookData)));
+
+            if (index != -1)
+            {
+                BookDatas.RemoveAt(index);
+            }
+            else
+            {
+                OnMessageApplication(String.Format("Failed to SYNC book."));
+                return;
+            }
+
+            SelectedBookData = null;
         }
 
         private void CreateAuthor()
@@ -336,22 +386,59 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         {
             AuthorEditingStarted?.Invoke(this, new AuthorEditingEventArgs(authorData, bookId));
         }
-        private void Model_AuthorDatasChanged(Object sender, int e)
+        private void Model_AuthorDataChanged(Object sender, AuthorData authorData)
         {
-            OnPropertyChanged("BookDatas");
-            OnPropertyChanged("AuthorDatas");
+            if (authorData == null)
+            {
+                OnMessageApplication(String.Format("Failed to SYNC author."));
+                return;
+            }
+
+            foreach (BookData bookData in authorData.BookDatas)
+            {
+                Int32 index = BookDatas.IndexOf(BookDatas.FirstOrDefault(b => b.Equals(bookData)));
+
+                if (index != -1)
+                {
+                    if (SelectedBookData.Equals(bookData))
+                    {
+                        BookDatas.RemoveAt(index);
+                        BookDatas.Insert(index, bookData);
+
+                        SelectedBookData = BookDatas[index];
+                    }
+                    else
+                    {
+                        BookDatas.RemoveAt(index);
+                        BookDatas.Insert(index, bookData);
+                    }
+                }
+                else
+                {
+                    OnMessageApplication(String.Format("Failed to SYNC author."));
+                }
+            }
+        }
+        private void Model_BookAuthorDataCreated(Object sender, BookAuthorData bookAuthorData)
+        {
+            UpdateGUIByBook(bookAuthorData.BookData, "book to author");
+        }
+        private void Model_BookAuthorDataDeleted(Object sender, BookAuthorData bookAuthorData)
+        {
+            UpdateGUIByBook(bookAuthorData.BookData, "book to author");
         }
 
         private void CreateCover()
         {
+            if (SelectedBookData == null
+             || SelectedBookData.Cover != null)
+            {
+                OnMessageApplication(String.Format("Failed to CREATE cover.{0}Info: Local sync problem.", Environment.NewLine));
+                return;
+            }
+
             try
             {
-                if (SelectedBookData == null
-                 || SelectedBookData.Cover != null)
-                {
-                    return;
-                }
-
                 OpenFileDialog dialog = new OpenFileDialog
                 {
                     CheckFileExists = true,
@@ -362,10 +449,8 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
 
                 if (result == true)
                 {
-                    CoverData newCoverData = _model.CreateCover(SelectedBookData.Id,
-                                            ImageHandler.OpenAndResize(dialog.FileName, 300));
+                    _model.CreateCover(SelectedBookData.Id, ImageHandler.OpenAndResize(dialog.FileName, 300));
 
-                    CoverIds.Add(newCoverData.Id);
                 }
             }
             catch (Exception exception)
@@ -375,15 +460,15 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         }
         private void AddCover()
         {
+            if (SelectedBookData == null)
+            {
+                OnMessageApplication(String.Format("Failed to ADD cover.{0}Info: Invalid cover is null.", Environment.NewLine));
+                return;
+            }
+
             try
             {
-                if (SelectedBookData == null)
-                {
-                    OnMessageApplication(String.Format("Failed to ADD cover.{0}Info: Invalid cover is null.", Environment.NewLine));
-                    return;
-                }
-
-                CoverData coverData = _model.AddCover(SelectedBookData.Id, SelectedAddingCoverDataId);
+                _model.AddCover(SelectedBookData.Id, SelectedAddingCoverDataId);
             }
             catch (Exception exception)
             {
@@ -409,36 +494,167 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             }
 
         }
-        private void Model_CoverDatasChanged(Object sender, int e)
+        private void Model_CoverDataChanged(Object sender, BookData bookData)
         {
-            OnPropertyChanged("BookDatas");
-            OnPropertyChanged("CoverDatas");
+            UpdateGUIByBook(bookData, "cover");
+        }
+        private void Model_CoverDataRemoved(Object sender, BookData bookData)
+        {
+            UpdateGUIByBook(bookData, "cover");
         }
 
         private void CreateVolume()
         {
-            //throw new NotImplementedException();
+            if (SelectedBookData == null)
+            {
+                OnMessageApplication(String.Format("Failed to CREATE volume.{0}Info: Local sync problem.", Environment.NewLine));
+                return;
+            }
+
+            try
+            {
+                _model.CreateVolume(new VolumeData(), SelectedBookData.Id);
+            }
+            catch (Exception exception)
+            {
+                OnMessageApplication(String.Format("Failed to CREATE volume.{0}Info: {1}", Environment.NewLine, exception.Message));
+            }
         }
-        private void UpdateVolume()
+        private void SortOutVolume()
         {
-            //throw new NotImplementedException();
+            if (SelectedBookData == null
+             || SelectedVolumeData == null)
+            {
+                OnMessageApplication(String.Format("Failed to UPDATE volume.{0}Info: Local sync problem.", Environment.NewLine));
+                return;
+            }
+
+            VolumeData volumeData = new VolumeData(SelectedVolumeData.Id, !SelectedVolumeData.IsSortedOut);
+
+            try
+            {
+                _model.UpdateVolume(volumeData);
+            }
+            catch (Exception exception)
+            {
+                OnMessageApplication(String.Format("Failed to UPDATE volume.{0}Info: {1}", Environment.NewLine, exception.Message));
+            }
         }
         private void DeleteVolume()
         {
-            //throw new NotImplementedException();
+            if (SelectedBookData == null
+             || SelectedVolumeData == null)
+            {
+                OnMessageApplication(String.Format("Failed to DELETE volume.{0}Info: Local sync problem.", Environment.NewLine));
+                return;
+            }
+
+            try
+            {
+                _model.DeleteVolume(SelectedVolumeData.Id);
+            }
+            catch (Exception exception)
+            {
+                OnMessageApplication(String.Format("Failed to UPDATE volume.{0}Info: {1}", Environment.NewLine, exception.Message));
+            }
         }
-        private void OnVolumeEditingStarted(VolumeData volumeData, Int32 bookId)
+        private void Model_VolumeDataChanged(Object sender, VolumeData volumeData)
         {
-            VolumeEditingStarted?.Invoke(this, new VolumeEditingEventArgs(volumeData, bookId));
+            UpdateGUIByBook(volumeData.BookData, "volume");
         }
-        private void Model_VolumeDatasChanged(Object sender, string e)
+        private void Model_VolumeDataDeleted(Object sender, VolumeData volumeData)
         {
-            //throw new NotImplementedException();
+            UpdateGUIByBook(volumeData.BookData, "volume");
         }
 
-        private void Model_LendingDatasChanged(Object sender, int e)
+        private void TurnLending()
         {
-            //throw new NotImplementedException();
+            if (SelectedRelevantLendingData == null)
+            {
+                OnMessageApplication(String.Format("Failed to UPDATE lending.{0}Info: Local sync problem.", Environment.NewLine));
+                return;
+            }
+
+            try
+            {
+                _model.TurnLending(SelectedRelevantLendingData);
+            }
+            catch (Exception exception)
+            {
+                OnMessageApplication(String.Format("Failed to UPDATE volume.{0}Info: {1}", Environment.NewLine, exception.Message));
+            }
+        }
+        private void Model_LendingDataChanged(Object sender, LendingData lendingData)
+        {
+            if (lendingData == null)
+            {
+                OnMessageApplication("Failed to SYNC lending.");
+                return;
+            }
+
+            Int32 index = RelevantLendingDatas.IndexOf(RelevantLendingDatas.FirstOrDefault(ld => ld.Equals(lendingData)));
+
+            if (index != -1)
+            {
+                RelevantLendingDatas.RemoveAt(index);
+
+                if (lendingData.Active == 2 && lendingData.EndDate < DateTime.UtcNow)
+                {
+                    SelectedRelevantLendingData = null;
+                    return;
+                }
+
+                RelevantLendingDatas.Insert(index, lendingData);
+
+                SelectedRelevantLendingData = RelevantLendingDatas[index];
+            }
+            else
+            {
+                OnMessageApplication("Failed to SYNC lending.");
+            }
+        }
+        private void Model_LendingDataDeleted(Object sender, LendingData lendingData)
+        {
+            Int32 index = RelevantLendingDatas.IndexOf(RelevantLendingDatas.FirstOrDefault(ld => ld.Equals(lendingData)));
+
+            if (index != -1)
+            {
+                RelevantLendingDatas.RemoveAt(index);
+            }
+            else
+            {
+                if (lendingData.Active == 1
+                || (lendingData.Active == 0 && lendingData.EndDate > DateTime.UtcNow))
+                {
+                    OnMessageApplication(String.Format("Failed to SYNC lending."));
+                }
+                return;
+            }
+
+            SelectedRelevantLendingData = null;
+        }
+
+        private void UpdateGUIByBook(BookData bookData, String what)
+        {
+            if (bookData == null)
+            {
+                OnMessageApplication(String.Format("Failed to SYNC {0}.", what));
+                return;
+            }
+
+            Int32 index = BookDatas.IndexOf(BookDatas.FirstOrDefault(b => b.Equals(bookData)));
+
+            if (index != -1)
+            {
+                BookDatas.RemoveAt(index);
+                BookDatas.Insert(index, bookData);
+
+                SelectedBookData = BookDatas[index];
+            }
+            else
+            {
+                OnMessageApplication(String.Format("Failed to SYNC {0}.", what));
+            }
         }
 
         private async void LoadAsync()
@@ -450,6 +666,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
                 BookDatas = new ObservableCollection<BookData>(_model.BookDatas);
                 AuthorDatas = new ObservableCollection<AuthorData>(_model.AuthorDatas);
                 CoverIds = new ObservableCollection<Int32>(_model.CoverDatas.Select(c => c.Id));
+                RelevantLendingDatas = new ObservableCollection<LendingData>(_model.LendingDatas.Where(l => l.Active == 1 || (l.EndDate > DateTime.UtcNow && l.Active == 0)));
 
                 IsLoaded = true;
             }
@@ -463,6 +680,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             try
             {
                 await _model.SaveAsync();
+                await _model.LoadAsync();
                 OnMessageApplication("Changes saved successfully.");
             }
             catch (PersistenceUnavailableException)

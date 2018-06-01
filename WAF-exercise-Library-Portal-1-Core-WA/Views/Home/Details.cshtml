@@ -22,6 +22,8 @@ else
 
     @foreach (Volume volume in Model.Volumes)
     {
+        if (volume.IsSordtedOut == false)
+        {
         <p>
             Volume [@volume.Id]:
             @if (String.IsNullOrEmpty(ViewBag.CurrentApplicationUserName))
@@ -48,5 +50,6 @@ else
                 </li>
             }
         </ul>
+        }
     }
 }

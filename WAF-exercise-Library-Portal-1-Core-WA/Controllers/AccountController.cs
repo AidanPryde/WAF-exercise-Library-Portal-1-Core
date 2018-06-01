@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 
@@ -36,10 +38,12 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel user)
+        public async Task<IActionResult> Login(LoginViewModel user, String returnUrl = null)
         {
             if (!ModelState.IsValid)
+            {
                 return View("Login", user);
+            }
 
             var result = await _signInManager.PasswordSignInAsync(user.Username, user.UserPassword, user.RememberLogin, false);
             if (!result.Succeeded)
@@ -49,7 +53,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
                 return View("Login", user);
             }
 
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return RedirectToLocal(returnUrl);
         }
 
         [HttpGet]
@@ -87,11 +91,25 @@ namespace WAF_exercise_Library_Portal_1_Core_WA.Controllers
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
 
             return RedirectToAction(nameof(HomeController.Index), "Home");
+        }
+
+        [Authorize]
+        private ActionResult RedirectToLocal(String returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return RedirectToAction(nameof(HomeController.Index), "Home");
+            }
         }
     }
 }
