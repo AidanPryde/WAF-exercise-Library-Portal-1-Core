@@ -581,7 +581,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             }
             catch (Exception exception)
             {
-                OnMessageApplication(String.Format("Failed to UPDATE volume.{0}Info: {1}", Environment.NewLine, exception.Message));
+                OnMessageApplication(String.Format("Failed to UPDATE lending.{0}Info: {1}", Environment.NewLine, exception.Message));
             }
         }
         private void Model_LendingDataChanged(Object sender, LendingData lendingData)

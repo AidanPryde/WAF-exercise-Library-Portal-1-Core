@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>657</x>
+      <y>225</y>
+      <w>441</w>
+      <h>342</h>
+    </coordinates>
+    <panel_attributes>Application
+App
+--
+- _model: ILibraryModel
+- _loginViewModel: LoginViewModel
+- _loginView: LoginWindow
+- _mainViewModel: MainViewModel
+- _mainView: MainWindow
+- _bookViewModel: BookViewModel
+- _bookView: BookWindow
+- _authorViewModel: AuthorViewModel
+- _authorView: AuthorWindow
+--
++ App()
+- App_startup(object, StartupEventArgs): void
++ App_Exit(object, ExitEventArgs): async void
+- ViewModel_ExitApplication(object, EventArgs): void: void
+- ViewModel_MessageApplication(object, MessageEventArgs): void
+- LoginViewModel_LoginSuccess(object, EventArgs): void
+- LoginViewModel_LoginFailed(object, EventArgs): void
+- MainViewModel_BookEditingStarted(object, BookData bookData)
+- BookViewModel_BookEditingFinished(object, EventArgs): void
+- MainViewModel_AuthorEditingStarted(object, AuthorEditingEventArgs): void
+- AuthorViewModel_BookEditingFinished(object, EventArgs): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>558</x>
+      <y>1107</y>
+      <w>234</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Model::ILibraryModel
+--
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>567</x>
+      <y>477</y>
+      <w>108</w>
+      <h>648</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=-_model</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;10.0;10.0;700.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>747</x>
+      <y>81</y>
+      <w>153</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>Window
+View:MainWindow
+--
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>324</x>
+      <y>513</y>
+      <w>243</w>
+      <h>225</h>
+    </coordinates>
+    <panel_attributes>ViewModel:BookViewModel
+--
+- _model: ILibraryModel
+- _editedBookData: BookData
+--
++ BookViewModel(ILibraryModel, BookData)
+- OnBookEditingFinished(): void
+- Save(): void
+- Cancel(): void
+&lt;&lt;property&gt;&gt;
++ EditedBookData(): BookData
++ SaveCommand(): DelegateCommand
++ CancelCommand(): DelegateCommand
+&lt;&lt;event&gt;&gt;
++ BookEditingFinished(): EventHandler</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>585</x>
+      <y>594</y>
+      <w>234</w>
+      <h>324</h>
+    </coordinates>
+    <panel_attributes>ViewModel:LoginViewModel
+--
+- _model: ILibraryMode
+- _isReady: Boolean
+--
++ LoginViewModel(ILibraryModel)
+- OnLoginSuccess(): void
+- OnLoginFailed(): void
+- OnExitApplication(): void
+- LoginAsync(PasswordBox): void async
+
+&lt;&lt;property&gt;&gt;
++ IsReady(): Boolean
++ LoginCommand(): DelegateCommand
++ ExitCommand(): DelegateCommand
++ UserName89: String
+
+&lt;&lt;event&gt;&gt;
++ ExitApplication(): EventHandler
++ LoginSuccess(): EventHandler
++ LoginFailed(): EventHandler</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>945</x>
+      <y>63</y>
+      <w>153</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>Window
+View:AuthorWindow
+--
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>522</x>
+      <y>207</y>
+      <w>153</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=-_loginView</panel_attributes>
+    <additional_attributes>150.0;60.0;10.0;60.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>567</x>
+      <y>333</y>
+      <w>108</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=-_bookView</panel_attributes>
+    <additional_attributes>100.0;50.0;10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>810</x>
+      <y>135</y>
+      <w>90</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=-_mainView</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1008</x>
+      <y>135</y>
+      <w>99</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=-_authorView</panel_attributes>
+    <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>522</x>
+      <y>81</y>
+      <w>144</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>IValueConverter
+ActiveTypeConverter
+--
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>612</x>
+      <y>162</y>
+      <w>144</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>IValueConverter
+BookImageConverter
+--
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>657</x>
+      <y>99</y>
+      <w>108</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>684</x>
+      <y>99</y>
+      <w>81</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>70.0;10.0;10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>855</x>
+      <y>594</y>
+      <w>387</w>
+      <h>918</h>
+    </coordinates>
+    <panel_attributes>ViewModel::MainViewModel
+--
+- isLoaded: Boolean
+- _model: ILibraryModel
+- _books: ObservableCollection&lt;BookData&gt;
+- _selectedBookData: BookData
+- _authors: ObservableCollection&lt;AuthorData&gt;
+- _selectedBookData: AuthorData
+- _covers: ObservableCollection&lt;CoverData&gt;
+- _selectedBookData: CoverData
+- _revelantLendings: ObservableCollection&lt;LendingData&gt;
+- _selectedRelevantLendingData: BookData
+- _selectedVolumeData: VolumeData
+--
++ MainViewModel(ILibraryModel)
+- OnExitApplication(): void
+- OnAuthorEditingStarted(AuthorData, Int32): void
+- OnBookEditingStarted(BookData): void
+- Model_BookDataChanged(Object, BookData): void
+- Model_BookDataDeleted(Object, BookData): void
+- Model_AuthorDataChanged(Object, AuthorData): void
+- Model_BookAuthorDataCreated(Object, BookAuthorData): void
+- Model_BookAuthorDataDeleted(Object, BookAuthorData): void
+- Model_CoverDataChanged(Object, BookData): void
+- Model_VolumeDataChanged(Object, VolumeData): void
+- Model_VolumeDataDeleted(Object, VolumeData): void
+- Model_LendingDataChanged(Object, LendingData): void
+- Model_LendingDataDeleted(Object, LendingData): void
++ Books(): ObservableCollection&lt;BookData&gt;
++ SelectedBookData(): BookData
++ Authors(): ObservableCollection&lt;AuthorData&gt;
++ SelectedBookData(): AuthorData
++ Covers(): ObservableCollection&lt;CoverData&gt;
++ SelectedBookData(): CoverData
++ RevelantLendings(): ObservableCollection&lt;LendingData&gt;
++ SelectedRelevantLendingData(): BookData
++ SelectedVolumeData(): VolumeData
+- LoadAsync(): void async
+- SaveAsync(): void async
+
+&lt;&lt;property&gt;&gt;
++ IsLoaded(): Boolean
++ CreateBookCommand(): DelegateCommand
++ UpdateBookCommand(): DelegateCommand
++ DeleteBookCommand(): DelegateCommand
++ CreateAuthorCommand(): DelegateCommand
++ UpdateAuthorCommand(): DelegateCommand
++ AddAuthorCommand(): DelegateCommand
++ RemoveAuthorCommand(): DelegateCommand
++ CreateCoverCommand(): DelegateCommand
++ AddCoverCommand(): DelegateCommand
++ RemoveCoverCommand(): DelegateCommand
++ CreateVolumeCommand(): DelegateCommand
++ SortOutVolumeCommand(): DelegateCommand
++ DeleteVolumeCommand(): DelegateCommand
++ TurnLendingCommand(): DelegateCommand
++ ExitCommand(): DelegateCommand
++ LoadCommand(): DelegateCommand
++ SaveCommand(): DelegateCommand
+
+&lt;&lt;event&gt;&gt;
++ BookEditingStarted(): EventHandler&lt;BookData&gt;
++ AuthorEditingStarted(): EventHandler&lt;AuthorEditingEventArgs&gt;
++ ExitApplication(): EventHandler
+
+
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>765</x>
+      <y>945</y>
+      <w>108</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=-_model</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;10.0;10.0;180.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>513</x>
+      <y>1350</y>
+      <w>234</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>ImageHandler
+--
+--
++ OpenAndResize(String, Int32): Byte[]</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>738</x>
+      <y>1377</y>
+      <w>135</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>130.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>378</x>
+      <y>153</y>
+      <w>216</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>Window
+View:LoginWindow
+--
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>423</x>
+      <y>279</y>
+      <w>216</w>
+      <h>63</h>
+    </coordinates>
+    <panel_attributes>Window
+View:BookWindow
+--
+--</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1089</x>
+      <y>387</y>
+      <w>189</w>
+      <h>225</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=-_mainViewModel</panel_attributes>
+    <additional_attributes>10.0;10.0;80.0;10.0;80.0;230.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>594</x>
+      <y>504</y>
+      <w>126</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=-_loginViewModel</panel_attributes>
+    <additional_attributes>70.0;10.0;10.0;10.0;10.0;100.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>441</x>
+      <y>450</y>
+      <w>234</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=-_bookViewModel</panel_attributes>
+    <additional_attributes>240.0;10.0;10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>459</x>
+      <y>729</y>
+      <w>117</w>
+      <h>441</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=-_model</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;460.0;110.0;460.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>675</x>
+      <y>909</y>
+      <w>72</w>
+      <h>216</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=-_model</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;220.0</additional_attributes>
+  </element>
+</diagram>

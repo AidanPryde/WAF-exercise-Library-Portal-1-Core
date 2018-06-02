@@ -23,8 +23,8 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
             }
         }
 
-        public DelegateCommand ExitCommand { get; private set; }
         public DelegateCommand LoginCommand { get; private set; }
+        public DelegateCommand ExitCommand { get; private set; }
 
         public String UserName { get; set; }
 
@@ -94,15 +94,14 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.ViewModels
         {
             LoginSuccess?.Invoke(this, EventArgs.Empty);
         }
+        private void OnLoginFailed()
+        {
+            LoginFailed?.Invoke(this, EventArgs.Empty);
+        }
 
         private void OnExitApplication()
         {
             ExitApplication?.Invoke(this, EventArgs.Empty);
-        }
-
-        private void OnLoginFailed()
-        {
-            LoginFailed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

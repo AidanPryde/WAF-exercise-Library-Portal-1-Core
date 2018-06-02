@@ -876,7 +876,6 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Models
             await SaveVolumeAsync();
             await SaveLendingAsync();
         }
-
         private async Task SaveAuthorsAsync()
         {
             List<AuthorData> authorsToSave = _authorDatasFlags.Keys.ToList();

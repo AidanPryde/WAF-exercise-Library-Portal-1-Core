@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.AspNetCore.Http;
@@ -54,6 +55,11 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                     return NoContent();
                 }
 
+                if (_context.Book.FirstOrDefault(b => volumeData.BookData.Id == b.Id) == null)
+                {
+                    return StatusCode(StatusCodes.Status412PreconditionFailed);
+                }
+
                 var addedVolume = _context.Volume.Add(new Volume
                 {
                     Id = volumeData.Id,
@@ -89,9 +95,23 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                     return NotFound();
                 }
 
-                if (volumeData.BookData == null)
+                if (volumeData.BookData == null
+                 || _context.Book.FirstOrDefault(b => volumeData.BookData.Id == b.Id) == null)
                 {
-                    return NoContent();
+                    return StatusCode(StatusCodes.Status412PreconditionFailed);
+                }
+
+                List<Lending> lendings = new List<Lending>(_context.Lending.Where(l => l.VolumeId == volume.Id));
+
+                if (lendings != null)
+                {
+                    foreach (Lending lending in lendings)
+                    {
+                        if (IsStopingSortingOutVolumeLending(lending))
+                        {
+                            return StatusCode(StatusCodes.Status412PreconditionFailed);
+                        }
+                    }
                 }
 
                 volume.BookId = volumeData.BookData.Id;
@@ -154,6 +174,65 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                 // Internal Server Error
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
+        }
+
+        private LendingState GetLendingState(Lending lending)
+        {
+            DateTime now = DateTime.UtcNow;
+
+            if (now < lending.StartDate)
+            {
+                if (lending.Active == 0)
+                {
+                    return LendingState.TOO_SOON_TO_PICK_UP;
+                }
+                else
+                {
+                    return LendingState.ERROR;
+                }
+            }
+
+            if (now < lending.EndDate)
+            {
+                if (lending.Active == 0)
+                {
+                    return LendingState.READY_TO_PICK_UP;
+                }
+                else if (lending.Active == 1)
+                {
+                    return LendingState.PICKED_UP;
+                }
+                else
+                {
+                    return LendingState.RETURNED;
+                }
+            }
+
+            if (lending.Active == 0)
+            {
+                return LendingState.NOT_PICKED_UP;
+            }
+            else if (lending.Active == 1)
+            {
+                return LendingState.NOT_RETURNED;
+            }
+            else
+            {
+                return LendingState.RETURNED;
+            }
+        }
+        private Boolean IsStopingSortingOutVolumeLending(Lending lending)
+        {
+            LendingState lendingState = GetLendingState(lending);
+
+            if (lendingState == LendingState.ERROR
+             || lendingState == LendingState.NOT_RETURNED
+             || lendingState == LendingState.PICKED_UP)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

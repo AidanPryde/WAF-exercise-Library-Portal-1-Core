@@ -61,6 +61,13 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                     CoverId = bookData.Cover?.Id
                 });
 
+                if ((bookData.Cover != null
+                    && _context.Cover.FirstOrDefault(c => c.Equals(bookData.Cover)) == null)
+                    || _context.Book.FirstOrDefault(b => b.Isbn == bookData.Isbn) != null)
+                {
+                    return StatusCode(StatusCodes.Status412PreconditionFailed);
+                }
+
                 _context.SaveChanges();
 
                 bookData.Id = addedBook.Entity.Id;
@@ -87,6 +94,13 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                 if (book == null)
                 {
                     return NotFound();
+                }
+
+                if ((bookData.Cover != null
+                    && _context.Cover.FirstOrDefault(c => c.Equals(bookData.Cover)) == null)
+                    || _context.Book.FirstOrDefault(b => b.Isbn == bookData.Isbn && b.Id != bookData.Id) != null)
+                {
+                    return StatusCode(StatusCodes.Status412PreconditionFailed);
                 }
 
                 book.Title = bookData.Title;
@@ -117,6 +131,13 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
                 if (book == null)
                 {
                     return NotFound();
+                }
+
+                if  (book.CoverId != null
+                    || book.BookAuthors.Any()
+                    || book.Volumes.Any())
+                {
+                    return StatusCode(StatusCodes.Status412PreconditionFailed);
                 }
 
                 _context.Book.Remove(book);

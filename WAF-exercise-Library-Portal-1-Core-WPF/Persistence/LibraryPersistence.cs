@@ -69,7 +69,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
         {
             try
             {
-                HttpResponseMessage response = await _client.PostAsJsonAsync("api/Books", new BookData(bookData.Id, bookData.Title, bookData.PublishedYear, bookData.Isbn, new CoverData(bookData.Cover.Id, bookData.Cover?.Image)));
+                HttpResponseMessage response = await _client.PostAsJsonAsync("api/Books", new BookData(bookData.Id, bookData.Title, bookData.PublishedYear, bookData.Isbn, bookData.Cover == null ? null : new CoverData(bookData.Cover.Id, bookData.Cover?.Image)));
                 bookData.Id = (await response.Content.ReadAsAsync<Int32>());
                 return response.IsSuccessStatusCode;
             }
@@ -82,7 +82,7 @@ namespace WAF_exercise_Library_Portal_1_Core_WPF.Persistence
         {
             try
             {
-                HttpResponseMessage response = await _client.PutAsJsonAsync("api/Books/", new BookData(bookData.Id, bookData.Title, bookData.PublishedYear, bookData.Isbn, new CoverData(bookData.Cover.Id, bookData.Cover?.Image)));
+                HttpResponseMessage response = await _client.PutAsJsonAsync("api/Books/", new BookData(bookData.Id, bookData.Title, bookData.PublishedYear, bookData.Isbn, bookData.Cover == null ? null : new CoverData(bookData.Cover.Id, bookData.Cover?.Image)));
                 return response.IsSuccessStatusCode;
             }
             catch (Exception exception)

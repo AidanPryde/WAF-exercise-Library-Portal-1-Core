@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>110</x>
+      <y>480</y>
+      <w>380</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Model::LibraryModel
+--
+- _bookDatasFlags: Dictionary&lt;BookData, DataStateFlag&gt;
+--
+- LinkingDataLists(): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>110</x>
+      <y>610</y>
+      <w>160</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>DataStateFlag: enum</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>110</x>
+      <y>170</y>
+      <w>260</w>
+      <h>250</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Model::ILibraryModel
+--
+BookDatas: IReadOnlyList&lt;BookData&gt;
+--
+CreateBook(BookData): void
+UpdateBook(BookData): void
+DeleteBook(BookData): void
+
+LoginAsAdminAsync(): Task&lt;Boolean&gt;
+LogoutAsync(): Task&lt;Boolean&gt;
+
+LoadAsync(): Task
+SaveAsync(): Task</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>280</x>
+      <y>410</y>
+      <w>30</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>170</x>
+      <y>540</y>
+      <w>30</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>390</x>
+      <y>290</y>
+      <w>360</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Persistence::ILibraryPersistence
+--
+--
+ReadBookAsync(): Task&lt;IEnumerable&lt;BookData&gt; &gt;
+
+CreateBook(BookData bookData): Task&lt;Boolean&gt;
+UpdateBook(BookData bookData): Task&lt;Boolean&gt;
+DeleteBook(BookData bookData): Task&lt;Boolean&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>430</x>
+      <y>410</y>
+      <w>30</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>430</x>
+      <y>170</y>
+      <w>320</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Persistence::PersistenceUnavailableException
+--
+--
++ PersistenceUnavailableException(String)
++ PersistenceUnavailableException(Exception)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>610</x>
+      <y>230</y>
+      <w>30</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>510</x>
+      <y>490</y>
+      <w>230</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>Persistence::LibraryPersistence
+--
+--
+- _client: HttpClient</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>610</x>
+      <y>410</y>
+      <w>30</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+</diagram>

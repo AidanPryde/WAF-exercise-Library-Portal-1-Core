@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WAF-exercise-Library-Portal
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WAF-exercise-Library-Portal-1-Core-Db", "WAF-exercise-Library-Portal-1-Core-Db\WAF-exercise-Library-Portal-1-Core-Db.csproj", "{B055F16E-E44E-4BB0-8C03-3DBCF70A2B7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WAF-exercise-Library-Portal-1-Core-API", "WAF-exercise-Library-Portal-1-Core-API\WAF-exercise-Library-Portal-1-Core-API.csproj", "{C11BD8B7-ECB1-4449-BBBC-8E2DF82F9E50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WAF-exercise-Library-Portal-1-Core-API", "WAF-exercise-Library-Portal-1-Core-API\WAF-exercise-Library-Portal-1-Core-API.csproj", "{C11BD8B7-ECB1-4449-BBBC-8E2DF82F9E50}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WAF-exercise-Library-Portal-1-Core-WPF", "WAF-exercise-Library-Portal-1-Core-WPF\WAF-exercise-Library-Portal-1-Core-WPF.csproj", "{EDDB8880-0110-41F7-ACE8-A93AF8C8B759}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WAF-exercise-Library-Portal-1-Core-Test", "WAF-exercise-Library-Portal-1-Core-Test\WAF-exercise-Library-Portal-1-Core-Test.csproj", "{4D68B4E5-1A75-447C-BA48-4CB5B8B389E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{EDDB8880-0110-41F7-ACE8-A93AF8C8B759}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDDB8880-0110-41F7-ACE8-A93AF8C8B759}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDDB8880-0110-41F7-ACE8-A93AF8C8B759}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D68B4E5-1A75-447C-BA48-4CB5B8B389E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D68B4E5-1A75-447C-BA48-4CB5B8B389E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D68B4E5-1A75-447C-BA48-4CB5B8B389E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D68B4E5-1A75-447C-BA48-4CB5B8B389E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

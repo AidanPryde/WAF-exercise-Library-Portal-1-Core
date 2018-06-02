@@ -68,7 +68,7 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
             }
         }
 
-        // DELETE: api/ApiWithActions/5
+        // DELETE: api/Covers/5
         [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public IActionResult Delete(Int32 id)

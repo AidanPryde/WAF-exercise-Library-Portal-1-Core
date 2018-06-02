@@ -22,7 +22,7 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        // GET: api/Authors
+        // GET: api/BookAuthors
         [HttpGet]
         public IActionResult Get()
         {
@@ -42,7 +42,7 @@ namespace WAF_exercise_Library_Portal_1_Core_API.Controllers
             }
         }
 
-        // GET: api/Authors/{id}
+        // GET: api/BookAuthors/{id}
         [HttpGet("{id}", Name = "GetBookAuthor")]
         public IActionResult GetBookAuthor(Int32 id)
         {

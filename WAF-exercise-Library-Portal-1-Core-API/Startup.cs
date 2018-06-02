@@ -70,13 +70,8 @@ namespace WAF_exercise_Library_Portal_1_Core_API
             }
 
             app.UseSession();
-
-            //app.UseStatusCodePages();
-
             app.UseStaticFiles();
-
             app.UseAuthentication();
-
             app.UseMvc();
 
             DbInitializer.Initialize(serviceProvider.GetRequiredService<LibraryDbContext>(),
